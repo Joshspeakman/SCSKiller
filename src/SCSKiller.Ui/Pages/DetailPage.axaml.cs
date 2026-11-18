@@ -148,7 +148,7 @@ public sealed partial class DetailPage : UserControl, INavigable
     async void OnGrantFlatpak(object? _, RoutedEventArgs __)
     {
         if (Vm.GrantLauncher is not { } launcher) return;
-        if (await App.ConfirmAsync($"Let {launcher} read SCSKiller's recorder folder?", ScsKiller.FlatpakGrantConfirm(launcher, Vm.GrantWrites), ScsKiller.FlatpakGrantButton(launcher)))
+        if (await App.ConfirmAsync($"Let {launcher} read Preheat's recorder folder?", ScsKiller.FlatpakGrantConfirm(launcher, Vm.GrantWrites), ScsKiller.FlatpakGrantButton(launcher)))
             await Vm.GrantAsync();
     }
     void OnPlay(object? _, RoutedEventArgs __) => Vm.Play();
@@ -180,7 +180,7 @@ public sealed partial class DetailPage : UserControl, INavigable
         var (frameGen, upscaler, mods) = (Box("Frame generation was on"), Box("An upscaler was on (DLSS, FSR or XeSS)"),
             Box("Mods were installed (for example ReShade, OptiScaler or RenoDX)"));
         var problem = Warn(new TextBlock { TextWrapping = TextWrapping.Wrap, IsVisible = false });
-        var panel = new StackPanel { Spacing = 12, Children = { Text($"Tell other players how {vm.Name} ran after SCSKiller compiled it. The rating is anonymous.") } };
+        var panel = new StackPanel { Spacing = 12, Children = { Text($"Tell other players how {vm.Name} ran after Preheat compiled it. The rating is anonymous.") } };
         if (sent != null) panel.Children.Add(new TextBlock { Text = "You already rated this version of the game. Rating again replaces it.", TextWrapping = TextWrapping.Wrap, FontWeight = FontWeight.SemiBold });
         panel.Children.Add(choices);
         panel.Children.Add(new StackPanel { Children = { frameGen, upscaler, mods } });
@@ -409,7 +409,7 @@ public sealed partial class DetailPage : UserControl, INavigable
             Content = new StackPanel
             {
                 Spacing = 8,
-                Children = { new TextBlock { Text = "Name" }, box, new TextBlock { Text = "Only the name SCSKiller shows changes.", Classes = { "Secondary" }, TextWrapping = TextWrapping.Wrap } },
+                Children = { new TextBlock { Text = "Name" }, box, new TextBlock { Text = "Only the name Preheat shows changes.", Classes = { "Secondary" }, TextWrapping = TextWrapping.Wrap } },
             },
         };
         box.TextChanged += (_, _) => dialog.IsPrimaryButtonEnabled = (box.Text ?? "").Trim().Length > 0;
@@ -429,7 +429,7 @@ public sealed partial class DetailPage : UserControl, INavigable
     {
         var (id, manual) = (Vm.Row.Id, Vm.IsManual);
         if (!await App.ConfirmAsync($"Remove {Vm.Name} from the library?",
-                manual ? "SCSKiller forgets the game and takes its recorder out of the game's folder. The game's own files stay, and you can add it again any time." : Vm.HideNote,
+                manual ? "Preheat forgets the game and takes its recorder out of the game's folder. The game's own files stay, and you can add it again any time." : Vm.HideNote,
                 "Remove")) return;
         // refused while a compile of it runs, and a store game while it runs or its recorder stays in
         try { await Task.Run(() => { if (manual) Host.Core.RemoveManualGame(id); else Host.Core.HideGame(id); }); }
@@ -782,7 +782,7 @@ public sealed partial class DetailPage : UserControl, INavigable
     }
 
     public ContentDialog RiskDialog(DetailVm vm, GameState fresh) => App.Confirm($"Record {vm.Name} at your own risk?",
-        Text(DetailVm.RiskText(fresh) + " SCSKiller removes its files when the game exits, or after a crash at your next logon."
+        Text(DetailVm.RiskText(fresh) + " Preheat removes its files when the game exits, or after a crash at your next logon."
              + (ScsKiller.VulkanPickWarning(fresh) is { } pick ? "\n\n" + pick : "")), "Record session");
 
     // The start runs off the UI thread; the task it returns ends when the game exited and its files are out.

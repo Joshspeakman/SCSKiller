@@ -44,7 +44,7 @@ public sealed partial class AppLog : IProgress<string>
     public void Start(string where)
     {
         var last = LastLifecycle();
-        Mark($"SCSKiller {AppVersion.Current}{StartMark}{Environment.ProcessId}) on {Mask(where, _profile, _user)}");
+        Mark($"Preheat {AppVersion.Current}{StartMark}{Environment.ProcessId}) on {Mask(where, _profile, _user)}");
         if (last != null && last.Contains(StartMark)) Mark($"previous run ended unexpectedly, it started at {last[..last.IndexOf(' ', last.IndexOf(' ') + 1)]}");
         _started = 1;
         AppDomain.CurrentDomain.ProcessExit += (_, _) => FlushAsync(TimeSpan.FromSeconds(1)).Wait();
@@ -77,7 +77,7 @@ public sealed partial class AppLog : IProgress<string>
     {
         lock (_lines)   // the exit line goes in before anything completes the channel
         {
-            if (Interlocked.Exchange(ref _started, 0) == 1) Mark($"SCSKiller{ExitMark}{Environment.ProcessId}): {ExitReason}");
+            if (Interlocked.Exchange(ref _started, 0) == 1) Mark($"Preheat{ExitMark}{Environment.ProcessId}): {ExitReason}");
             _lines.Writer.TryComplete();
         }
         return _writer.WaitAsync(wait).ContinueWith(_ => { }, TaskScheduler.Default);

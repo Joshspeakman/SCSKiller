@@ -38,8 +38,8 @@
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
                     <TextBlock Classes="Icon" Text="{x:Static ui:Glyphs.Bolt}" FontSize="36" VerticalAlignment="Top" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" />
                     <StackPanel Grid.Column="1" Spacing="4">
-                        <TextBlock Text="SCSKiller" Classes="Section" FontSize="{DynamicResource TextSize.20}" />
-                        <TextBlock Text="Shader Compilation Stutter Killer" Classes="Secondary" />
+                        <TextBlock Text="Preheat" Classes="Section" FontSize="{DynamicResource TextSize.20}" />
+                        <TextBlock Text="Unofficial fork of SCSKiller (Shader Compilation Stutter Killer) by BlueHeisenberg. Not affiliated with or endorsed by SCSKiller." Classes="Secondary" TextWrapping="Wrap" />
                         <SelectableTextBlock Text="{Binding Version}" Classes="Caption" TextWrapping="Wrap" />
                         <WrapPanel ItemSpacing="12" Margin="0,4,0,0" IsVisible="{Binding ShowsCheck}">
                             <Button Content="Check for updates" Click="OnCheckForUpdates" IsEnabled="{Binding CanCheck}" />
@@ -50,31 +50,33 @@
                                   AutomationProperties.Name="Install updates automatically">
                             <StackPanel Spacing="2">
                                 <TextBlock Text="Install updates automatically" TextWrapping="Wrap" />
-                                <TextBlock Text="A downloaded update installs the next time SCSKiller starts or quits, never during a compile, an offline session or a game. Off: only Restart to update installs it."
+                                <TextBlock Text="A downloaded update installs the next time Preheat starts or quits, never during a compile, an offline session or a game. Off: only Restart to update installs it."
                                            Classes="Caption" TextWrapping="Wrap" />
                             </StackPanel>
                         </CheckBox>
                         <c:InfoBar IsVisible="{Binding HasUpdateProblem}" Message="{Binding UpdateProblem}" Severity="Warning" IsClosable="False" />
-                        <WrapPanel ItemSpacing="12" Margin="0,4,0,0" IsVisible="{Binding ShowsSource}">
+                        <WrapPanel ItemSpacing="12" Margin="0,4,0,0" IsVisible="False"><!-- Preheat: this downloads SCSKiller's tagged source; Preheat's is linked below -->
                             <Button Content="Download source code" Click="OnSource" IsEnabled="{Binding SourceIdle}" />
                             <SelectableTextBlock Text="{Binding SourceStatus}" Classes="Caption" VerticalAlignment="Center" TextWrapping="Wrap" />
                         </WrapPanel>
                         <TextBlock Margin="0,8,0,0" TextWrapping="Wrap"
                                    Text="Compiles your games' shaders into the graphics driver's cache ahead of time, so they don't stutter the first time you play them." />
                         <TextBlock Margin="0,8,0,0" Classes="Secondary" TextWrapping="Wrap">
-                            <Run Text="SCSKiller licence:" FontWeight="SemiBold" /><Run Text=" GPL-3.0-or-later, with an additional permission for Oodle, the Windows App SDK and graphics driver libraries (LICENSE-EXCEPTION.txt)" />
+                            <Run Text="Preheat licence:" FontWeight="SemiBold" /><Run Text=" GPL-3.0-or-later, with an additional permission for Oodle, the Windows App SDK and graphics driver libraries (LICENSE-EXCEPTION.txt)" />
                         </TextBlock>
                         <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
                             <HyperlinkButton Content="What's new" Classes="Link" Click="OnWhatsNew" />
                             <HyperlinkButton Content="Website" Classes="Link" NavigateUri="https://scskiller.com" />
-                            <HyperlinkButton Content="Source code" Classes="Link" NavigateUri="https://github.com/BlueHeisenberg/SCSKiller" />
-                            <HyperlinkButton Content="Support on Patreon" Classes="Link" NavigateUri="https://www.patreon.com/SCSKiller" />
+                            <HyperlinkButton Content="Preheat source code" Classes="Link" NavigateUri="https://github.com/Joshspeakman/SCSKiller" />
+                            <HyperlinkButton Content="Report a Preheat problem" Classes="Link" NavigateUri="https://github.com/Joshspeakman/SCSKiller/issues" />
+                            <HyperlinkButton Content="Based on SCSKiller (official)" Classes="Link" NavigateUri="https://github.com/BlueHeisenberg/SCSKiller" />
+                            <HyperlinkButton Content="Support SCSKiller on Patreon" Classes="Link" NavigateUri="https://www.patreon.com/SCSKiller" />
                         </StackPanel>
                     </StackPanel>
                 </Grid>
             </Border>
 
-            <StackPanel Spacing="8">
+            <StackPanel Spacing="8" IsVisible="False"><!-- Preheat: no problem reports to SCSKiller's server -->
                 <TextBlock Text="Problem reports you sent" Classes="Section" />
                 <TextBlock Text="Reports sent from earlier versions aren't listed." Classes="Secondary" TextWrapping="Wrap" IsVisible="{Binding NoProblems}" />
                 <ItemsControl ItemsSource="{Binding Problems}" Focusable="False">
@@ -96,7 +98,7 @@
 
             <StackPanel Spacing="8">
                 <TextBlock Text="Use at your own risk" Classes="Section" />
-                <TextBlock Text="SCSKiller is provided as is, without warranty. It checks each game for anti-cheat before adding its recorder, but that check can miss one. You use it at your own risk, and its authors are not responsible for bans, crashes or lost data."
+                <TextBlock Text="Preheat is provided as is, without warranty. It checks each game for anti-cheat before adding its recorder, but that check can miss one. You use it at your own risk, and its authors are not responsible for bans, crashes or lost data."
                            Classes="Secondary" TextWrapping="Wrap" />
             </StackPanel>
 

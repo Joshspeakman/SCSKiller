@@ -1,4 +1,4 @@
-using Avalonia.Automation;
+﻿using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Media;
 using SCSKiller.Core;
@@ -98,7 +98,7 @@ static class StartDialogs
     /// <summary>Primary: the Patreon page, Secondary: no, each never asked again. X or Esc: <see cref="ContentDialogResult.None"/>.</summary>
     public static ContentDialog SupportDialog() => new()
     {
-        Title = "Enjoying SCSKiller?", Content = "If it's been useful to you, you can support it on Patreon.",
+        Title = "Enjoying Preheat?", Content = "Preheat is built on SCSKiller. If it's been useful to you, you can support SCSKiller on Patreon.",
         PrimaryButtonText = "Okay, you earned it, take my money", SecondaryButtonText = "Stop bothering me, shader man",
         ShowsX = true, StackedButtons = true,
     };
@@ -155,8 +155,8 @@ static class StartDialogs
             {
                 new TextBlock
                 {
-                    Text = "Once a day SCSKiller can tell our server that an install is active, with its version and GPU vendor and no identifier. "
-                        + "This helps us count active installs so we can size our servers. It's off until you turn it on.",
+                    Text = "Once a day Preheat can tell SCSKiller's server that an install is active, with its version and GPU vendor and no identifier. "
+                        + "This helps SCSKiller count active installs (Preheat's too) so it can size its servers. It's off until you turn it on.",
                     TextWrapping = TextWrapping.Wrap,
                 },
                 new TextBlock { Text = "Change it any time in Settings.", TextWrapping = TextWrapping.Wrap, Classes = { "Caption" } },

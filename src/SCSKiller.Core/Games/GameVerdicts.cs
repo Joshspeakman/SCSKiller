@@ -35,7 +35,7 @@ public sealed class GameVerdicts
         ["driver-cache-ignored"] = "The driver doesn't use a compile's cache for this game",
         ["anti-cheat"] = "The game contains anti-cheat",
         ["crashes"] = "Compiling crashes this game or the driver",
-        ["engine-unreadable"] = "SCSKiller can't read this game's shaders yet",
+        ["engine-unreadable"] = "Preheat can't read this game's shaders yet",
     };
 
     /// <summary>A verdict for one game: what it is and the line the app shows.</summary>
@@ -99,7 +99,7 @@ public sealed class GameVerdicts
     /// <summary>The line for a reason code: the app's own, else the note, else one for the verdict.</summary>
     public static string Text(string verdict, string reason, string? note) =>
         reason != OtherReason && Reasons.TryGetValue(reason, out var own) ? own
-        : note ?? (verdict == NoStutterVerdict ? "This game prepares its shaders itself" : "SCSKiller can't compile this game");
+        : note ?? (verdict == NoStutterVerdict ? "This game prepares its shaders itself" : "Preheat can't compile this game");
 
     public static GameVerdicts Embedded { get => field ??= TryParse(ContentFile.Embedded("SCSKiller.Core.Games." + FileName))!; }
 

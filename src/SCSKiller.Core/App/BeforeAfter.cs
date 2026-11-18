@@ -15,7 +15,7 @@ public static partial class BeforeAfter
     const string NoFrames = "The {0} run has no frame times";
     const string NoCreates = "The {0} run has no pipeline log";
     const string TooShort = "The {0} run had {1} of play, play at least {2}.";
-    const string LibraryLoads = "The after run loaded {0} more pipelines from the game's own cache, not counted for SCSKiller";
+    const string LibraryLoads = "The after run loaded {0} more pipelines from the game's own cache, not counted for Preheat";
     const string OtherSettings = "The runs had different resolutions or display formats: {0} before, {1} after";
     const string OverlayOnce = "The in-game countdown was on in one run only";
     const string MaxCompiled = "The after run was compiled with Max compile";
@@ -25,12 +25,12 @@ public static partial class BeforeAfter
     const string MaybeHelped = "The game's DirectX 11 driver cache couldn't be told from another app's, so the after run may have used the before run's";
     const string FrameGenBoth = "Frame generation was {0} in both runs.";
     const string FrameGenOne = "Frame generation was on in the {0} run only.";
-    const string Share = "Shader compilation stutter in {0}: {1} → {2} in {3} of play after SCSKiller precompiled its shaders.";
+    const string Share = "Shader compilation stutter in {0}: {1} → {2} in {3} of play after Preheat precompiled its shaders.";
     const string ShareReady = " {0}% of pipelines were ready instead of {1}%.";
-    const string ShareSmooth = "{0} was already smooth here: SCSKiller took it from {1}% to {2}% of pipelines ready.";
-    const string ShareSmoothNoShare = "{0} was already smooth here: {1} → {2} shader compilation stutters in {3} of play with SCSKiller.";
-    const string ShareDx11 = "{0} on DirectX 11: {1} → {2} stutters of 50 ms or more in {3} of play, before and after SCSKiller precompiled its shaders.";
-    public const string Dx11Label = "DirectX 11: SCSKiller can't tell shader compilation stutters from other stutters";
+    const string ShareSmooth = "{0} was already smooth here: Preheat took it from {1}% to {2}% of pipelines ready.";
+    const string ShareSmoothNoShare = "{0} was already smooth here: {1} → {2} shader compilation stutters in {3} of play with Preheat.";
+    const string ShareDx11 = "{0} on DirectX 11: {1} → {2} stutters of 50 ms or more in {3} of play, before and after Preheat precompiled its shaders.";
+    public const string Dx11Label = "DirectX 11: Preheat can't tell shader compilation stutters from other stutters";
     const string ShareLink = " scskiller.com";
     const int ShareMax = 280, LinkWeight = 23;   // X's limit; X counts any link as 23
 

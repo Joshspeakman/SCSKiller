@@ -111,11 +111,11 @@ public sealed partial class ScsKiller
         var name = Path.GetFileName(dir);
         try
         {
-            if (!IsFolderName(name) || !filled.TryGetValue(name, out var fill)) return "SCSKiller didn't fill it";
+            if (!IsFolderName(name) || !filled.TryGetValue(name, out var fill)) return "Preheat didn't fill it";
             if (!Directory.Exists(dir) || IsLink(dir)) return "it is gone or a link";
             if (HoldsLink(dir)) return "it holds a link";
             // a later folder of that name holds only what the runtime wrote since
-            if (FileTimes.CreatedUtc(new DirectoryInfo(dir)) is not { } made || made > fill.At.UtcDateTime.AddSeconds(2)) return "it was made again after SCSKiller filled it";
+            if (FileTimes.CreatedUtc(new DirectoryInfo(dir)) is not { } made || made > fill.At.UtcDateTime.AddSeconds(2)) return "it was made again after Preheat filled it";
             if (LaunchExe(g) is not { } exe || D3DSCache.FolderName(exe) == name || D3DSCache.FolderName(g.ExePath) == name) return "the game's current version uses it";
             if (File.Exists(fill.Exe) || D3DSCache.FolderName(fill.Exe) != name) return "its game version is still installed";
             if (MovedD3DSCache(g, r) is { } moved && SameDir(moved, dir)) return "it goes into the game's new folder";

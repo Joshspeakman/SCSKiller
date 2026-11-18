@@ -69,7 +69,7 @@ public sealed class SteamSetAside(string journalPath, string keepDir, string lea
     /// (the journal stays then, for Restore to put back what moved).</summary>
     public void SetAside(string gameId, string folder, IReadOnlyList<string>? files = null)
     {
-        using var own = Lock() ?? throw new InvalidOperationException("another SCSKiller is setting the cache aside or putting it back, try again in a moment");
+        using var own = Lock() ?? throw new InvalidOperationException("another Preheat is setting the cache aside or putting it back, try again in a moment");
         if (File.Exists(journalPath)) throw new InvalidOperationException($"a cache is set aside already, see {journalPath}");
         List<Item> items = [There(folder, Kind.Folder)
             ? new(folder, folder + Suffix, Entries(folder, hash: true) ?? throw new InvalidOperationException($"{folder} holds a link or a file that can't be read"))

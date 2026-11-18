@@ -7,7 +7,7 @@ namespace SCSKiller.Core.App;
 /// so a copy changes it only when it points at that copy's exe, or when the user turns the setting on or off there.</summary>
 public static class WindowsStartup
 {
-    public const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run", ValueName = "SCSKiller", TrayArg = "--tray";
+    public const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run", ValueName = "Preheat", TrayArg = "--tray";
 
     public static string Command(string appExe) => $"\"{appExe}\" {TrayArg}";
 

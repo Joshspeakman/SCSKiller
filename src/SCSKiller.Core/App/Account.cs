@@ -58,7 +58,7 @@ public sealed class Account
     public Account(string dataDir, RouteFailover? routes = null, Action<Uri>? openBrowser = null, TimeProvider? clock = null,
         IKeyring? keyring = null, IProgress<string>? log = null)
     {
-        file = new(Path.Combine(dataDir, "auth.dat"), "SCSKiller sign-in", keyring, log);
+        file = new(Path.Combine(dataDir, "auth.dat"), "Preheat sign-in", keyring, log);
         this.routes = routes ?? RouteFailover.Default;
         http = new HttpClient(this.routes, disposeHandler: false) { Timeout = TimeSpan.FromSeconds(60) };
         this.openBrowser = openBrowser ?? (u => Process.Start(new ProcessStartInfo(u.AbsoluteUri) { UseShellExecute = true })?.Dispose());
@@ -296,7 +296,7 @@ public sealed class Account
         HttpRequestException => Unreachable,
         OperationCanceledException => "The SCSKiller server didn't answer in time. Try again later.",
         JsonException or KeyNotFoundException or InvalidOperationException or FormatException =>
-            "The SCSKiller server gave an answer this version doesn't understand. An update of SCSKiller may fix it.",
+            "The SCSKiller server gave an answer this version doesn't understand. An update of Preheat may fix it.",
         Win32Exception => "Couldn't open your web browser: " + e.Message,
         _ => e.Message,
     };
@@ -371,23 +371,23 @@ public sealed class LoopbackCallback : IDisposable
             var q = c.Request.QueryString;
             if (q["state"] != state)
             {
-                Reply(c, 400, "This page doesn't belong to the sign-in SCSKiller is waiting for. Start again from SCSKiller.");
+                Reply(c, 400, "This page doesn't belong to the sign-in Preheat is waiting for. Start again from Preheat.");
                 throw new AccountException("The browser's answer didn't match this sign-in, so it was refused. Please try again.");
             }
             if (q["error"] != null || q["code"] is not { Length: > 0 } code)
             {
-                Reply(c, 400, "Sign-in didn't complete. You can close this tab and try again from SCSKiller.");
+                Reply(c, 400, "Sign-in didn't complete. You can close this tab and try again from Preheat.");
                 throw new AccountException(q["error"] == "access_denied" ? "Sign-in was cancelled on Patreon." : $"Sign-in didn't complete ({q["error"] ?? "no code"}). Please try again.");
             }
-            Reply(c, 200, "You're signed in. You can close this tab and go back to SCSKiller.");
+            Reply(c, 200, "You're signed in. You can close this tab and go back to Preheat.");
             return code;
         }
     }
 
     static void Reply(HttpListenerContext c, int status, string text)
     {
-        var html = Encoding.UTF8.GetBytes("<!doctype html><meta charset=utf-8><title>SCSKiller</title>" +
-            $"<body style=\"font:16px 'Segoe UI',sans-serif;margin:3em\"><h2>SCSKiller</h2><p>{WebUtility.HtmlEncode(text)}</p>");
+        var html = Encoding.UTF8.GetBytes("<!doctype html><meta charset=utf-8><title>Preheat</title>" +
+            $"<body style=\"font:16px 'Segoe UI',sans-serif;margin:3em\"><h2>Preheat</h2><p>{WebUtility.HtmlEncode(text)}</p>");
         c.Response.StatusCode = status;
         c.Response.ContentType = "text/html; charset=utf-8";
         c.Response.KeepAlive = false;   // sent whole (Content-Length) and closed gracefully: Dispose right after can't cut the page off

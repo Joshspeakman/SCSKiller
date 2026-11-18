@@ -77,7 +77,7 @@ public sealed class FromSoftReader(string dataDir, Func<string, byte[]?>? downlo
         var title = TitleOf(game);
         if (title == null)
             return GameFiles.EnumerateFiles(dir, "*.bhd").Any(b => File.Exists(GameFiles.ChangeExtension(b, ".bdt")) && IsEncryptedBhd(b))
-                ? new EngineInfo(Family, "-", null, UnrealRhi.Ambiguous, false, "FromSoftware archives SCSKiller has no key for (a title it doesn't know yet)") // not Encrypted: no user key opens them
+                ? new EngineInfo(Family, "-", null, UnrealRhi.Ambiguous, false, "FromSoftware archives Preheat has no key for (a title it doesn't know yet)") // not Encrypted: no user key opens them
                 : null;
         if (Archives(game, dir, title, null, out var why, downloadLog: Download.Log) is not { } archives)
             return new EngineInfo(Family, "-", title.Name, title.Api, true, null, Note: title.Uxm != null ? Download.FailedNote : null);

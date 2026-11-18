@@ -55,7 +55,7 @@ public static partial class VulkanLayer
         {
             var file = SettingsOf(manifest);
             if (ForeignSettings(file) is [var other, ..]) throw new IOException($"{other} is another program's Vulkan loader settings: not replaced");
-            var entries = Entries(file) ?? throw new IOException($"{file} isn't SCSKiller's: not replaced");
+            var entries = Entries(file) ?? throw new IOException($"{file} isn't Preheat's: not replaced");
             entries.RemoveAll(e => Same(e.Manifest, manifest));
             entries.Add(new(g.Id, manifest, Exes(g)));
             Write(file, entries);

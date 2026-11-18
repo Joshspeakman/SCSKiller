@@ -62,7 +62,7 @@ sealed class Login1 : IShutdownLock, IDisposable
     {
         try
         {
-            return await _bus.CallMethodAsync(Call(Manager, "Inhibit", "ssss", what, "SCSKiller", why, mode),
+            return await _bus.CallMethodAsync(Call(Manager, "Inhibit", "ssss", what, "Preheat", why, mode),
                 (m, _) => m.GetBodyReader().ReadHandle<SafeFileHandle>(), null).ConfigureAwait(false);
         }
         catch (DBusErrorReplyException) { return null; }   // refused (polkit, or a Flatpak's filtered bus)

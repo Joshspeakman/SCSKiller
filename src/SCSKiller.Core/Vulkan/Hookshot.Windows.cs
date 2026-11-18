@@ -75,7 +75,7 @@ public static partial class Hookshot
                 var path = Path.Combine(lines[1], marker);
                 if (!File.Exists(path)) continue;
                 File.Delete(path);
-                log?.Report($"{path}: left by a hidden precompile that ended with SCSKiller, taken out");
+                log?.Report($"{path}: left by a hidden precompile that ended with Preheat, taken out");
             }
             File.Delete(pending);
         }

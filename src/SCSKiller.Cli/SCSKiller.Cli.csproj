@@ -6,7 +6,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <AssemblyName>scskiller</AssemblyName>
+    <AssemblyName>preheat</AssemblyName>
     <TargetFramework>net10.0-windows</TargetFramework>
     <!-- Linux: the native CLI, run as dotnet scskiller.dll. EnableWindowsTargeting builds the Windows one anywhere. -->
     <TargetFramework Condition="!$([MSBuild]::IsOSPlatform('Windows')) And '$(EnableWindowsTargeting)' != 'true'">net10.0</TargetFramework>

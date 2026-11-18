@@ -45,7 +45,7 @@ public sealed partial class ScsKiller
     readonly ConcurrentDictionary<string, bool> _ending = new();   // game id -> its session's process exited, its end not handled yet
     readonly object _armGate = new();
     public const string AlwaysOffNote = "Always record turned off: the game's anti-cheat changed. Turn it on again to confirm.";
-    public const string UnboundSessionNote = "This launch started before SCSKiller could attach: nothing was recorded. Try again.";
+    public const string UnboundSessionNote = "This launch started before Preheat could attach: nothing was recorded. Try again.";
     public const string AntiCheatSessionNote = "The recorder didn't load in this session. This game contains anti-cheat. Please report it so we can check.";
 
     /// <summary>The game page's note for a risk or offline session the proxy admitted none of, from its refusal during the session (null:
@@ -297,7 +297,7 @@ public sealed partial class ScsKiller
         RecordsAntiCheat && anyAntiCheat && RiskFits(g, engine);
 
     /// <summary>The game page's line for <see cref="GameState.RiskTrusted"/>.</summary>
-    public const string TrustedNote = "This game blocks unsigned modules, so SCSKiller can't record it.";
+    public const string TrustedNote = "This game blocks unsigned modules, so Preheat can't record it.";
 
     /// <summary>The game's exe holds a trusted launch check (its \cfg\trustedlaunch.cfg and -allow_third_party_software): it
     /// hooks the loader and fails every DLL it can't verify against its signature lists, so any recorder beside it stops the
@@ -493,7 +493,7 @@ public sealed partial class ScsKiller
                     if (_current == gameId) return "a compile of it is in progress";
                 // an Always record arm from the process list: the watcher still lists a game for a few polls after its exit
                 if (always ? RunsUnwatched(g) : GameRunning(g)) return "it is running: close the game first";
-                if ((vulkan ? VulkanLayerSource : _proxyDll) is not { } src || !File.Exists(src)) return $"the recorder ({dll}) wasn't found next to SCSKiller";
+                if ((vulkan ? VulkanLayerSource : _proxyDll) is not { } src || !File.Exists(src)) return $"the recorder ({dll}) wasn't found next to Preheat";
                 if (vulkan && VulkanBlocked(g, key!, VulkanManifest(key!)) is { } blocked) return blocked;
                 if (stamp == null) return "its exe can't be read";
                 // fresh, not the scan's: what the confirmation named is what is there
@@ -506,9 +506,9 @@ public sealed partial class ScsKiller
                     return $"{AntiCheatName(found, vac)} was found, not {AntiCheatName(shown, vac)}" + (always ? "" : ": confirm again");
                 }
                 if (TrustedLaunch(g)) return "the game blocks unsigned modules";   // fresh: the exe may have updated since the state
-                if (!manual && !launcher && !always && (launch = LaunchCommand(g)) == null) return "its store has no launch SCSKiller can start";
+                if (!manual && !launcher && !always && (launch = LaunchCommand(g)) == null) return "its store has no launch Preheat can start";
                 // a mod is left as it is: only one holding a name the session places refuses
-                if (Foreign(dir)) return "another SCSKiller copy's recorder is in its folder";
+                if (Foreign(dir)) return "another Preheat copy's recorder is in its folder";
                 if ((RecorderOwnFiles.Where(f => !f.StartsWith(Dll9, StringComparison.OrdinalIgnoreCase)).Concat(placed).FirstOrDefault(f => Path.Exists(Path.Combine(dir, f))) ?? PreloadIn(dir)) is { } there) return $"{there} is already in its folder";
                 if (ShaderInjectorIn(dir) != false) return SkipShaderInjector;
                 if (IntelLocalDriver(g)) return SkipIntelDriver;
@@ -623,7 +623,7 @@ public sealed partial class ScsKiller
     }
 
     /// <summary>A Vulkan game's session until this build carries the Vulkan recorder (the loader proxy and its layer).</summary>
-    public const string VulkanRecorderMissing = "this version of SCSKiller can't record Vulkan games yet";
+    public const string VulkanRecorderMissing = "this version of Preheat can't record Vulkan games yet";
 
     /// <summary>A game the user added that only its own launcher starts (Star Citizen, from the RSI Launcher; Wuthering Waves,
     /// whose exe asks for admin rights and quits without its launcher): its session binds the first process of its exe that
@@ -634,7 +634,7 @@ public sealed partial class ScsKiller
     /// <summary><see cref="LauncherStarts"/> for the game page: until its session binds, the card says <see cref="LauncherSessionNote"/>.</summary>
     public static bool StartsFromLauncher(GameState s) => LauncherStarts(s.Game, s.Engine);
 
-    public const string LauncherSessionNote = "Start the game from its launcher now. SCSKiller records the first launch within 5 minutes.";
+    public const string LauncherSessionNote = "Start the game from its launcher now. Preheat records the first launch within 5 minutes.";
 
     /// <summary>The stamp line of a session at the user's own risk, after its binding (<see cref="BoundTo"/>), inside the signature.</summary>
     internal const string RiskLine = "risk=1\r\n";
@@ -1052,13 +1052,13 @@ public sealed partial class ScsKiller
                 lock (_lock)
                     if (_current == gameId) return "a compile of it is in progress";
                 if (GameRunning(g)) return "it is running: close the game first";
-                if (_proxyDll == null || !File.Exists(_proxyDll)) return $"the recorder ({dll}) wasn't found next to SCSKiller";
+                if (_proxyDll == null || !File.Exists(_proxyDll)) return $"the recorder ({dll}) wasn't found next to Preheat";
                 if (stamp == null) return "its exe can't be read";
                 // fresh, not the scan's: EasyAntiCheat and nothing else
                 if (GameFiles.DetectAntiCheat(g) != AntiCheat.EasyAntiCheat || GameFiles.DetectAntiCheat(g, ignore: AntiCheat.EasyAntiCheat) != AntiCheat.None)
                     return "its install has another anti-cheat, or couldn't be read whole";
                 // never alongside a mod: none of the names the session places may be there
-                if (Foreign(dir)) return "another SCSKiller copy's recorder is in its folder";
+                if (Foreign(dir)) return "another Preheat copy's recorder is in its folder";
                 if ((RecorderOwnFiles.Where(f => !f.StartsWith(Dll9, StringComparison.OrdinalIgnoreCase)).Concat(placed).FirstOrDefault(f => Path.Exists(Path.Combine(dir, f))) ?? PreloadIn(dir)) is { } there) return $"{there} is already in its folder";
                 if (ShaderInjectorIn(dir) != false) return SkipShaderInjector;
                 if (IntelLocalDriver(g)) return SkipIntelDriver;
@@ -1336,7 +1336,7 @@ public sealed partial class ScsKiller
         if (Foreign(Path.GetDirectoryName(s.Exe)!))   // a journal copied with another copy's data (a portable first start): that copy's session
         {
             if (!ForeignProven(Path.GetDirectoryName(s.Exe)!)) return [LedgerStamp];
-            log($"{name}: the offline session in {Path.GetDirectoryName(s.Exe)} is another SCSKiller copy's: left to it");
+            log($"{name}: the offline session in {Path.GetDirectoryName(s.Exe)} is another Preheat copy's: left to it");
             rec.OfflineSession = null;
             store.SaveGame(id, rec);
             return null;
@@ -1443,7 +1443,7 @@ public sealed partial class ScsKiller
                 if (!listed.Contains(file)) continue;
                 // SCSKiller's own names by name; a dll only when it is our proxy, anything else only with the bytes it wrote
                 if (Named(file) || file is Dll12 or Dll11 or Dll9 && IsOurProxy(path) || rec.RecorderFiles.TryGetValue(file, out var hash) && Sha256(path) == hash) Delete(file);
-                else log($"{name}: left {path}: not SCSKiller's");   // it leaves the journal below
+                else log($"{name}: left {path}: not Preheat's");   // it leaves the journal below
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException) { left.Add(file); }   // read again at the retry
         }

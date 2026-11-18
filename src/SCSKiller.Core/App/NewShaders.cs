@@ -20,8 +20,8 @@ public static class NewShaders
     /// <summary>A rebuilt plan's count (ScsKiller.PlannerChanged: "can now compile N more" or <see cref="ScsKiller.PlanReplacedReason"/>): told once per compile, whatever the
     /// day. Not countable ("can now compile more of this game"), its count is the last plan's.</summary>
     static bool PlannerChanged(GameState s) => s.Status == GameStatus.Stale && s.StatusReason.StartsWith(ScsKiller.PlanReplacedReason + " (", StringComparison.Ordinal)
-        || s.Status == GameStatus.Stale && s.StatusReason.StartsWith("SCSKiller can now compile ", StringComparison.Ordinal)
-        && !s.StatusReason.StartsWith("SCSKiller can now compile more", StringComparison.Ordinal);
+        || s.Status == GameStatus.Stale && s.StatusReason.StartsWith("Preheat can now compile ", StringComparison.Ordinal)
+        && !s.StatusReason.StartsWith("Preheat can now compile more", StringComparison.Ordinal);
 
     /// <summary>What a notification about the game says, as the notified store keeps it; null when there is nothing to tell.</summary>
     public static string? Key(GameState s, IReadOnlySet<string> driverStale) =>

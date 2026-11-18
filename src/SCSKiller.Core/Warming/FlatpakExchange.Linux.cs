@@ -628,7 +628,7 @@ sealed class FlatpakExchange : IDisposable
                 if (!Libc.TryLock(dir)) continue;
                 var budget = EntryMax;
                 Remove(dir, 0, ref budget);
-                if (Libc.UnlinkAt(parent, name, folder: true) == 0) log?.Invoke($"removed {path}, a compile's folder an SCSKiller that has exited left");
+                if (Libc.UnlinkAt(parent, name, folder: true) == 0) log?.Invoke($"removed {path}, a compile's folder an Preheat that has exited left");
             }
         }
     }

@@ -13,7 +13,7 @@ public static partial class BeforeAfter
         var c = r.Compare;
         string subtitle = c.Dx11 ? Dx11Label
             : c.AlreadySmooth ? "Already smooth on this PC: few shader compilation stutters even before the compile"
-            : "Shader compilation stutter before and after SCSKiller compiled its shaders";
+            : "Shader compilation stutter before and after Preheat compiled its shaders";
         // DirectX 11: no ready share and no shader split, every frame of 50 ms or more
         (string, string)[] tiles = c.Dx11
             ? [("STUTTERS", $"{c.Before.Hitches:N0}  →  {c.After.Hitches:N0}"),
@@ -59,7 +59,7 @@ public static partial class BeforeAfter
     }
 
     /// <summary>The card's corner line: the app and, with the GPU shown, its driver (a driver version names the vendor).</summary>
-    public static string Versions(string? driver) => $"SCSKiller {AppVersion.Current}" + (driver == null ? "" : $"  ·  driver {driver}");
+    public static string Versions(string? driver) => $"Preheat {AppVersion.Current}" + (driver == null ? "" : $"  ·  driver {driver}");
 
     /// <summary>The card's footer: the play, the swap chain's size (all SCSKiller knows of the settings) and, when shown, the GPU.</summary>
     public static string Footer(BeforeAfterResult r, string? gpu)

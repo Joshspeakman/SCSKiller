@@ -115,7 +115,7 @@ public static partial class UpdateChannels
     /// <summary>The note after a check of <paramref name="checkedChannel"/> found nothing newer: it names that channel when it
     /// isn't the wanted one.</summary>
     public static string UpToDate(string checkedChannel, string? chosen, string buildChannel) =>
-        checkedChannel == (chosen ?? buildChannel) ? "SCSKiller is up to date." : $"SCSKiller is up to date on the {checkedChannel} channel.";
+        checkedChannel == (chosen ?? buildChannel) ? "Preheat is up to date." : $"Preheat is up to date on the {checkedChannel} channel.";
 
     /// <summary>A download from the <paramref name="staged"/> channel's feed still installs: it is the feed <see cref="Effective"/>
     /// picks. With the entitlements unknown (null: signed in, but no token read since the start, as at a logon without
@@ -148,7 +148,8 @@ public sealed record Installation(InstallKind Kind, string? Manager = null)
     public const string PackageMarker = ".scskiller-package";
 
     /// <summary>Velopack updates it: the updater checks, downloads and applies.</summary>
-    public bool UpdatesItself => Kind is InstallKind.Velopack or InstallKind.AppImage;
+    /// Preheat (a fork) never updates itself: SCSKiller's feed is signed for SCSKiller and would replace Preheat with it.
+    public bool UpdatesItself => false;
 
     /// <summary>A Flatpak remote or a package manager updates it: the updater never runs.</summary>
     public bool UpdatedElsewhere => Kind is InstallKind.Flatpak or InstallKind.Package;
@@ -158,7 +159,7 @@ public sealed record Installation(InstallKind Kind, string? Manager = null)
     {
         InstallKind.Flatpak => "Updates come from your software store.",
         InstallKind.Package => "Updates come from your package manager.",
-        _ => null,
+        _ => "Preheat doesn't update itself. New versions: github.com/Joshspeakman/SCSKiller",
     };
 
     /// <summary>A Flatpak or a package, found without Velopack; null otherwise, and always on Windows. <paramref name="appDir"/>:
@@ -303,8 +304,8 @@ public static class AutoInstall
         && (AppVersion.Parse(staged.Version) is { } v && v.CompareTo(current) > 0 || backToStable && staged.Channel == UpdateChannels.Stable);
 
     public static string ReadyNote(string version, bool auto) => auto
-        ? $"SCSKiller {version} is ready: it installs the next time SCSKiller starts or quits, or use Restart to update at the top."
-        : $"SCSKiller {version} is ready: use Restart to update at the top.";
+        ? $"Preheat {version} is ready: it installs the next time Preheat starts or quits, or use Restart to update at the top."
+        : $"Preheat {version} is ready: use Restart to update at the top.";
 }
 
 /// <summary>Where updates and their source come from. <see cref="GhRepo"/> is compiled in: renaming the public repo
@@ -740,7 +741,7 @@ public static class Busy
     /// trusted (<see cref="NamedMutex.Held"/>): nothing waiting on it goes ahead.</summary>
     public static bool IsHeld(string? name = null) => NamedMutex.Held(name ?? Name);
 
-    public const string CompileStarted = "A compile started meanwhile. The update installs when SCSKiller quits after it has finished.";
+    public const string CompileStarted = "A compile started meanwhile. The update installs when Preheat quits after it has finished.";
 
     /// <summary>The updater's side of the handshake, the last step before it hands an update over: the marker, then
     /// <see cref="IsHeld"/>. A compile worker holds Busy first, then reads the marker (<see cref="TryHold"/>), so one of the

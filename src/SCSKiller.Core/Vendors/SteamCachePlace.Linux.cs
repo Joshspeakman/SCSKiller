@@ -172,7 +172,7 @@ sealed partial class SteamCachePlace(string gameDir, string appName, string stea
     {
         AppStore.PathGate gate;
         try { gate = new AppStore.PathGate(ManifestFile, TimeSpan.Zero); }
-        catch (IOException e) when (IoErrors.HeldElsewhere(e)) { return new(SteamPlaceState.SteamBusy, Why: "another SCSKiller process is at it"); }
+        catch (IOException e) when (IoErrors.HeldElsewhere(e)) { return new(SteamPlaceState.SteamBusy, Why: "another Preheat process is at it"); }
         using (gate)
             try { return run(); }
             catch (Refused e)
@@ -635,7 +635,7 @@ sealed partial class SteamCachePlace(string gameDir, string appName, string stea
     /// <summary>Locks Steam's folder against another SCSKiller process, whatever its data folder, while it is open.</summary>
     static void Lock(Folder dir, string? leaf)
     {
-        if (!Libc.TryLock(dir.Handle)) throw new Refused(SteamPlaceState.SteamBusy, "another SCSKiller process is at Steam's folder", leaf);
+        if (!Libc.TryLock(dir.Handle)) throw new Refused(SteamPlaceState.SteamBusy, "another Preheat process is at Steam's folder", leaf);
     }
 
     /// <summary>Removes the temp files a run cut short left: under the folder's lock, none is in use. While a journal is
@@ -737,11 +737,11 @@ sealed partial class SteamCachePlace(string gameDir, string appName, string stea
                     Log?.Invoke(s.Line(Path.Combine(m.Target, s.File.Name)));
                 // a set of the same folder keeps its manifest until SCSKiller's entries are out of it: nothing else lists them
                 if (setMoved && stayed.Count > 0)
-                    throw new Refused(SteamPlaceState.Failed, $"SCSKiller's entries in {string.Join(", ", stayed.Select(s => s.File.Name))} can't be taken out yet", leaf);
+                    throw new Refused(SteamPlaceState.Failed, $"Preheat's entries in {string.Join(", ", stayed.Select(s => s.File.Name))} can't be taken out yet", leaf);
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException or Refused)
             {
-                if (setMoved) throw e as Refused ?? new Refused(SteamPlaceState.Failed, $"SCSKiller's entries in the game's earlier cache file can't be taken out yet: {e.Message}", leaf);
+                if (setMoved) throw e as Refused ?? new Refused(SteamPlaceState.Failed, $"Preheat's entries in the game's earlier cache file can't be taken out yet: {e.Message}", leaf);
                 if (e is not Refused { Once: true } || Tell(e.Message)) Log?.Invoke($"what was placed in {m.Target} stays there: {e.Message}");
             }
         using var dir = OpenLeaf(target, make: true)!;
@@ -894,7 +894,7 @@ sealed partial class SteamCachePlace(string gameDir, string appName, string stea
         var mode = o.Existing.Exists ? o.Existing.Mode : UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.GroupRead | UnixFileMode.OtherRead;
         var buffer = new byte[1 << 16];
         using var s = new Sink(o, () => Create(Path.Combine(dir, TempPrefix + o.Target.Name + ".bin"), mode, known), tocHeader, binHeader, mode);
-        Refused Unkept() => new(SteamPlaceState.Failed, $"SCSKiller's dictionary entry doesn't check, {o.Target.Name} can't keep it: left as it is");
+        Refused Unkept() => new(SteamPlaceState.Failed, $"Preheat's dictionary entry doesn't check, {o.Target.Name} can't keep it: left as it is");
         bool Copy(SafeFileHandle from, Record r, bool warm, bool carried = false)
         {
             if (r.Length > buffer.Length) buffer = new byte[Math.Max(r.Length, 2L * buffer.Length)];
@@ -1548,7 +1548,7 @@ sealed partial class SteamCachePlace(string gameDir, string appName, string stea
     /// <see cref="Why"/>: a file of its pair is missing, so which entries it holds can't be read.</summary>
     sealed record Stay(FileEntry File, HashSet<Placed> Ours, Print Print, string? Why)
     {
-        public string Line(string name) => Why == null ? $"{name} can't be read, SCSKiller's entries stay listed"
+        public string Line(string name) => Why == null ? $"{name} can't be read, Preheat's entries stay listed"
             : Ours.Count == 0 ? $"{name} stays as it is, {Why}" : $"{Ours.Count(p => p.Key.B != DictTail):N0} pipelines stay in {name}, {Why}";
     }
 
@@ -1562,7 +1562,7 @@ sealed partial class SteamCachePlace(string gameDir, string appName, string stea
         var (files, stayed) = m.Files.Count > 0 && Directory.Exists(m.Target) ? RemoveFrom(m, m.Target, ct) : ([], []);
         var vkd3d = RemoveVkd3d(m);
         var line = $"taken out of {Where}: " + string.Join(", ", files.Select(f => $"{f.Name} {f.Pipelines:N0} pipelines ({Format.Bytes(f.Bytes)})")
-            .DefaultIfEmpty("nothing of SCSKiller's was left there")) + (vkd3d != null ? $", vkd3d: {vkd3d}" : "");
+            .DefaultIfEmpty("nothing of Preheat's was left there")) + (vkd3d != null ? $", vkd3d: {vkd3d}" : "");
         foreach (var f in m.Files.Where(f => Keyed(f) && !stayed.Any(s => s.File == f))) File.Delete(OursFile(f.Name));
         if (stayed.Count == 0)
         {
@@ -1631,7 +1631,7 @@ sealed partial class SteamCachePlace(string gameDir, string appName, string stea
             slotsOnly &= stays.All(s => s.File.Slot);
         }
         var line = $"taken out of {Where} by its owner note: " + string.Join(", ", gone.Select(f => $"{f.Name} {f.Pipelines:N0} pipelines ({Format.Bytes(f.Bytes)})")
-            .DefaultIfEmpty("nothing of SCSKiller's was left there"));
+            .DefaultIfEmpty("nothing of Preheat's was left there"));
         if (stayed.Count == 0)
         {
             Log?.Invoke(line);
@@ -1677,7 +1677,7 @@ sealed partial class SteamCachePlace(string gameDir, string appName, string stea
                     {
                         // a slot that isn't as SCSKiller wrote it stays, and is SCSKiller's to wait for until Steam folds it
                         if (f.Slot) stayed.Add(f.Keys > 0 ? new(f, ReadOurs(f.Name), Print.Of(e), "the game added to it, Steam folds it into the merged file at the game's exit")
-                            : new(f, [], Print.Of(e), (f.Unproven ? "SCSKiller's note doesn't record its identity" : "it isn't as SCSKiller wrote it")
+                            : new(f, [], Print.Of(e), (f.Unproven ? "Preheat's note doesn't record its identity" : "it isn't as Preheat wrote it")
                                 + ", Steam folds it into the merged file at the game's exit"));
                         continue;
                     }
@@ -2125,7 +2125,7 @@ sealed partial class SteamCachePlace(string gameDir, string appName, string stea
         var path = OursFile(name);
         if (!File.Exists(path))
         {
-            Log?.Invoke($"{path} is missing: SCSKiller's entries in {name} count as Steam's");
+            Log?.Invoke($"{path} is missing: Preheat's entries in {name} count as Steam's");
             return [];
         }
         var bytes = File.ReadAllBytes(path);

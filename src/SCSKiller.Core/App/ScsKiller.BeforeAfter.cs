@@ -9,7 +9,7 @@ namespace SCSKiller.Core.App;
 public sealed partial class ScsKiller
 {
     public const string NoStartNote = "Didn't see the game start";
-    public const string LostNote = "The game started again before SCSKiller read the run, so it's lost";
+    public const string LostNote = "The game started again before Preheat read the run, so it's lost";
     public const string DriverVoidNote = "The driver changed since the before recording, start over";
     public const string BuildVoidNote = "The game was updated since the before recording, start over";
     public const string NotCompiledNote = "The compile didn't finish, compile again";
@@ -20,7 +20,7 @@ public sealed partial class ScsKiller
     public const string RecorderNotReadyNote = "The recorder isn't ready, so the run wouldn't be measured: ";
     public const string OldCacheNote = "Old driver cache files were in use: close the game and play the before run again";
     public const string OldCacheRedoNote = "Old driver cache files were in use, play the before run again";
-    public const string UnseenRedoNote = "SCSKiller wasn't running during the before run, so it couldn't check the driver cache: play it again";
+    public const string UnseenRedoNote = "Preheat wasn't running during the before run, so it couldn't check the driver cache: play it again";
     public const string FramesStoppedNote = "Frame times stopped when frame generation started, so this run can't be measured. Turn frame generation off for the before and after recording";
     public const string RestoreFailedNote = "Couldn't put back {0} of the driver's cache files: they're in {1}";
     public const string AsideHeldNote = "The game's shader cache is still in use, try again in a minute";
@@ -128,10 +128,10 @@ public sealed partial class ScsKiller
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException) { installed = current = iniReady = false; }
         if (installed && current && iniReady && Attested(s.Game)) return;
-        throw new InvalidOperationException(RecorderNotReadyNote + (s.RecorderSkip ?? (s.RecorderNote == NoteForeignIni ? "its scskiller.cfg isn't SCSKiller's" : s.RecorderNote) ?? _unstamped.GetValueOrDefault(gameId)
+        throw new InvalidOperationException(RecorderNotReadyNote + (s.RecorderSkip ?? (s.RecorderNote == NoteForeignIni ? "its scskiller.cfg isn't Preheat's" : s.RecorderNote) ?? _unstamped.GetValueOrDefault(gameId)
             ?? (!s.RecorderEffective ? "it's off for this game"
-                : installed && !current ? "another SCSKiller's recorder is in the game and couldn't be replaced"
-                : installed && !iniReady ? "its scskiller.cfg isn't SCSKiller's"
+                : installed && !current ? "another Preheat's recorder is in the game and couldn't be replaced"
+                : installed && !iniReady ? "its scskiller.cfg isn't Preheat's"
                 : installed ? "the game's folder is still being checked, try again in a moment" : "it couldn't be installed")));
     }
 

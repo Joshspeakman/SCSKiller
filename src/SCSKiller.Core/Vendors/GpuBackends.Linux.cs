@@ -21,7 +21,7 @@ public static partial class GpuBackends
         : NvidiaOwn(adapter) ? new NvidiaLinuxBackend(adapter.Gpu) : new MesaLinuxBackend(adapter.Gpu, driver: adapter.Driver);
 
     public static partial string? DriverNote(IGpuVendorBackend backend) => backend is MesaLinuxBackend { Driver: MesaLinux.Anv or MesaLinux.Nvk } m
-        ? $"{m.Gpu.Name} compiles through the Mesa path on Mesa's {(m.Driver == MesaLinux.Anv ? "ANV" : "NVK")} driver, whose cache behaviour SCSKiller hasn't measured" : null;
+        ? $"{m.Gpu.Name} compiles through the Mesa path on Mesa's {(m.Driver == MesaLinux.Anv ? "ANV" : "NVK")} driver, whose cache behaviour Preheat hasn't measured" : null;
 
     /// <summary>The backend of an adapter whose Vulkan driver isn't known.</summary>
     public static IGpuVendorBackend For(GpuInfo gpu, bool intel = false) => For(new DxgiAdapter(gpu, 0, 0), intel);

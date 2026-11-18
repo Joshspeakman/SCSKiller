@@ -85,7 +85,7 @@ public static class LaunchGpu
 
     static DxgiAdapter? Software(out string? why, out bool software)
     {
-        (why, software) = ("SCSKiller doesn't compile on a software renderer.", true);
+        (why, software) = ("Preheat doesn't compile on a software renderer.", true);
         return null;
     }
 

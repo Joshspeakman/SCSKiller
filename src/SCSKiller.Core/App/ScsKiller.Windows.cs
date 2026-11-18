@@ -134,7 +134,7 @@ public sealed partial class ScsKiller
 
     /// <summary>The logon entry's value name and command: "!" defers Windows' deletion of it until the command has run.</summary>
     internal static (string Name, string Command) RunOnceEntry(string gameId, string exe) =>
-        ($"!SCSKiller offline cleanup {gameId}", $"\"{exe}\" {CleanupArg} \"{gameId}\"");
+        ($"!Preheat offline cleanup {gameId}", $"\"{exe}\" {CleanupArg} \"{gameId}\"");
 
     private static partial void RunOnce(string gameId, string? exe)
     {

@@ -436,7 +436,7 @@ public static partial class VulkanPlan
     {
         var (work, validated, skipped) = (Path.Combine(workDir, WorkFile), Path.Combine(workDir, ValidatedFile), Path.Combine(workDir, Planner.SkippedFile));
         if (new[] { work, validated, skipped }.Any(p => SteamPipelineCache.Owned(p)))
-            throw new InvalidOperationException($"{workDir} is or links into Steam's folders, which SCSKiller never writes");
+            throw new InvalidOperationException($"{workDir} is or links into Steam's folders, which Preheat never writes");
         Directory.CreateDirectory(workDir);
         var wanted = PlanFile.Read(plan.FilePath).Records.Where(r => r.Tag == Tag).Select(r => Encoding.ASCII.GetString(r.Payload)).ToHashSet(StringComparer.Ordinal);
         var archives = OpenAll(sources, log);

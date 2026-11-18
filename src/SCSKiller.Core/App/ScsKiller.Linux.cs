@@ -43,20 +43,20 @@ public sealed partial class ScsKiller
         // the devices listed are SCSKiller's, which its own environment may have cut short of the game's
         string? why;
         var (picked, software) = ((DxgiAdapter?)null, false);
-        if (LaunchGpu.Hides(Environment.GetEnvironmentVariable, vars)) why = "SCSKiller's own environment hides GPUs";
+        if (LaunchGpu.Hides(Environment.GetEnvironmentVariable, vars)) why = "Preheat's own environment hides GPUs";
         else picked = LaunchGpu.Pick(vars, all, out why, out software);
         if (why != null)
         {
             if (software) throw new NotReadyException(why);
             // not told, not refused: the Settings GPU as without the variables, which could pick another device than it
-            Log?.Report($"{g.Name}: SCSKiller can't tell which GPU its launch options run it on ({why}), the compile runs on {Vendor.Gpu.Name}");
+            Log?.Report($"{g.Name}: Preheat can't tell which GPU its launch options run it on ({why}), the compile runs on {Vendor.Gpu.Name}");
             return;
         }
         if (env is { } vkd3dEnv) vars = [.. vars, .. vkd3dEnv];
         env = vars;
         if (picked == null) return;
         var backend = GpuBackends.For(picked, Settings.ExperimentalIntel);
-        if (backend is UnsupportedVendor u) throw new NotReadyException(u.Why ?? $"SCSKiller doesn't compile on {picked.Gpu.Name}.");
+        if (backend is UnsupportedVendor u) throw new NotReadyException(u.Why ?? $"Preheat doesn't compile on {picked.Gpu.Name}.");
         // the backend is the process's: a game on the other kind of driver isn't compiled by it
         if (MesaLinux.Is(backend.Caps) != MesaLinux.Is(Vendor.Caps))
             throw new NotReadyException($"{g.Name}'s launch options run it on {picked.Gpu.Name}. Pick {picked.Gpu.Name} in Settings to compile it.");
@@ -192,7 +192,7 @@ public sealed partial class ScsKiller
         bool owned;
         try { owned = mutex.WaitOne(TimeSpan.FromSeconds(10)); }
         catch (AbandonedMutexException) { owned = true; }
-        if (!owned) { log($"the recorder's files stay in {data}: another SCSKiller process holds the revocation list"); return; }
+        if (!owned) { log($"the recorder's files stay in {data}: another Preheat process holds the revocation list"); return; }
         try
         {
             try

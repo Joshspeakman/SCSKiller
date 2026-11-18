@@ -91,7 +91,7 @@ public static partial class VulkanLayer
     {
         var dirs = DirsOf(g);
         var entries = dirs.Select(d => Entry(d, manifest)).ToList();
-        if (entries.FirstOrDefault(e => File.Exists(e) && !Ours(e, manifest)) is { } foreign) throw new IOException($"{foreign} isn't this SCSKiller's: not replaced");
+        if (entries.FirstOrDefault(e => File.Exists(e) && !Ours(e, manifest)) is { } foreign) throw new IOException($"{foreign} isn't this Preheat's: not replaced");
         if (g != null && ManifestKey(manifest) is { } key && !IsSteamKey(key) && !NamesGame(manifest, g.Id))
         {
             var file = Path.Combine(Path.GetDirectoryName(manifest)!, GameFile);

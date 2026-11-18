@@ -10,9 +10,9 @@ namespace SCSKiller.Core.App;
 /// never changed, and the Hidden and NoDisplay a menu editor sets are kept.</summary>
 public static class MenuEntry
 {
-    public const string AppId = "com.BlueHeisenberg.SCSKiller", FileName = AppId + ".desktop";
+    public const string AppId = "io.github.Joshspeakman.Preheat", FileName = AppId + ".desktop";
     // the key that makes an entry ours: a menu editor keeps the keys it doesn't know
-    const string OwnKey = "X-SCSKiller-AppImage", Placeholder = "Exec=@EXEC@";
+    const string OwnKey = "X-Preheat-AppImage", Placeholder = "Exec=@EXEC@";
     static readonly string[] UsersKeys = ["Hidden", "NoDisplay"];
 
     /// <summary>$XDG_DATA_HOME, else ~/.local/share: a relative one is ignored, as the XDG spec says.</summary>
@@ -42,7 +42,7 @@ public static class MenuEntry
             var template = Path.Combine(packageDir, "share", "applications", FileName);
             if (!File.Exists(template)) return $"Menu entry: the package has no {template}";
             var now = Read(file);
-            if (now is { Ours: false }) return $"Menu entry: {file} isn't SCSKiller's, left as it is";
+            if (now is { Ours: false }) return $"Menu entry: {file} isn't Preheat's, left as it is";
             if (Fill(File.ReadAllText(template), program, now?.Keys) is not { } text) return $"Menu entry: {template} needs exactly one {Placeholder} line";
             var icons = Icons(packageDir, dataHome);
             if (!Write(file, now?.Text, text) && !icons) return null;

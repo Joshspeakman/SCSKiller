@@ -108,7 +108,7 @@ public static class NewsState
     const int Keep = 200;
 
     /// <summary>The --screenshots notifications' item: news.json may have none.</summary>
-    public static NewsItem Sample { get; } = new("sample", "2026-10-22", "News from SCSKiller", "The first line of a news item shows here");
+    public static NewsItem Sample { get; } = new("sample", "2026-10-22", "News from Preheat", "The first line of a news item shows here");
 
     /// <summary>The items not dismissed, and the ids of those unread.</summary>
     public static (IReadOnlyList<NewsItem> Shown, IReadOnlySet<string> Unread) Of(AppStore store, IEnumerable<NewsItem> items)
@@ -146,7 +146,7 @@ public static class NewsState
     /// <summary>A notification's second line: the body up to its first newline.</summary>
     public static string FirstLine(string body) => body.Split('\n', 2)[0].Trim();
 
-    public static string MoreLine(int n) => $"{n} more news item{(n == 1 ? "" : "s")} in SCSKiller";
+    public static string MoreLine(int n) => $"{n} more news item{(n == 1 ? "" : "s")} in Preheat";
 
     static readonly object Lock = new();
 

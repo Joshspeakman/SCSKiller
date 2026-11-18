@@ -8,14 +8,14 @@ static partial class WarmHost
 {
     public const string NotSteamError = "compiling on Linux works only for games Steam, Heroic, Lutris or Faugus runs with Wine or Proton",
         NotSteamVulkanError = "compiling Vulkan games on Linux works only for games Steam runs",
-        InFlatpakError = "the Flatpak version of SCSKiller can't compile or record Flatpak Steam games yet",
+        InFlatpakError = "the Flatpak version of Preheat can't compile or record Flatpak Steam games yet",
         FlatpakVulkanError = "compiling Vulkan games from the Flatpak Steam isn't available yet",
         FlatpakSteamMesaError = "compiling games from the Flatpak Steam isn't available yet on AMD or Intel graphics",
         FlatpakNoSystemdError = "compiling games from the Flatpak Steam needs a systemd user session",
         FlatpakNoCommandError = "compiling games from the Flatpak Steam needs the flatpak command",
         FlatpakColonError = "compiling games from the Flatpak Steam needs a data folder path without a ':'",
         FlatpakNoPidfdError = "compiling games from the Flatpak Steam needs a newer Linux kernel",
-        InFlatpakLauncherError = "the Flatpak version of SCSKiller can't compile games of a Flatpak Heroic, Lutris or Faugus on Mesa's drivers yet",
+        InFlatpakLauncherError = "the Flatpak version of Preheat can't compile games of a Flatpak Heroic, Lutris or Faugus on Mesa's drivers yet",
         FlatpakLauncherNoSystemdError = "compiling games of a Flatpak Heroic, Lutris or Faugus on Mesa's drivers needs a systemd user session",
         FlatpakMesaError = "compiling games of a Flatpak Heroic, Lutris or Faugus isn't available yet on Mesa's drivers: the Flatpak runs them on its own copy of Mesa";
 

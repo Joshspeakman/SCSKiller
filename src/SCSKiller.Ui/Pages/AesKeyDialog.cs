@@ -50,8 +50,8 @@ static class AesKeyDialog
     }
 
     const string MultiKeyHint = "0x and 64 hex digits, one key per line";
-    const string AesIntro = "SCSKiller couldn't find this game's key in its exe (protected exes hide it).";
-    const string GameKeyIntro = "With this game's key, SCSKiller compiles it without a recording.";
-    const string FileKeyIntro = "SCSKiller can't read all of this game's shaders without its key.";
-    const string RecordedIntro = "Without its key, SCSKiller compiles only the pipelines it records while you play. The key adds the shaders in the game's files.";
+    const string AesIntro = "Preheat couldn't find this game's key in its exe (protected exes hide it).";
+    const string GameKeyIntro = "With this game's key, Preheat compiles it without a recording.";
+    const string FileKeyIntro = "Preheat can't read all of this game's shaders without its key.";
+    const string RecordedIntro = "Without its key, Preheat compiles only the pipelines it records while you play. The key adds the shaders in the game's files.";
 }

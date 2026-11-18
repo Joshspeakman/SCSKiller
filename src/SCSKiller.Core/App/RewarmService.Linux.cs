@@ -12,10 +12,10 @@ namespace SCSKiller.Core.App;
 /// changed or removed.</summary>
 public static class RewarmService
 {
-    public const string Name = "scskiller-rewarm", Service = Name + ".service", Timer = Name + ".timer";
+    public const string Name = "preheat-rewarm", Service = Name + ".service", Timer = Name + ".timer";
     /// <summary>The app's argument that runs the CLI beside it in its place, and that CLI's file name.</summary>
-    public const string CliArg = "--cli", Cli = "scskiller";
-    const string OwnKey = "X-SCSKiller", Command = "rewarm-stale --if-driver-changed";
+    public const string CliArg = "--cli", Cli = "preheat";
+    const string OwnKey = "X-Preheat", Command = "rewarm-stale --if-driver-changed";
 
     /// <summary>systemctl --user, or a fake in tests.</summary>
     public interface ISystemctl
@@ -33,7 +33,7 @@ public static class RewarmService
     public static string ServiceText(string program) =>
         $"""
         [Unit]
-        Description=SCSKiller: re-warm game shader caches after a GPU driver update
+        Description=Preheat: re-warm game shader caches after a GPU driver update
         ConditionACPower=true
         ConditionFileIsExecutable={program.Replace("%", "%%")}
         {OwnKey}=rewarm
@@ -49,7 +49,7 @@ public static class RewarmService
     public static string TimerText() =>
         $"""
         [Unit]
-        Description=SCSKiller: check for a GPU driver update after sign-in
+        Description=Preheat: check for a GPU driver update after sign-in
         {OwnKey}=rewarm
 
         [Timer]
@@ -115,7 +115,7 @@ public static class RewarmService
     {
         var units = new[] { (Service, ServiceText(program)), (Timer, TimerText()) }.Select(u => (File: Path.Combine(dir, u.Item1), Text: u.Item2)).ToList();
         foreach (var u in units)
-            if (Read(u.File) is { Ours: false }) throw new InvalidOperationException($"{u.File} isn't SCSKiller's");
+            if (Read(u.File) is { Ours: false }) throw new InvalidOperationException($"{u.File} isn't Preheat's");
         Directory.CreateDirectory(dir);
         foreach (var u in units) MenuEntry.Write(u.File, null, u.Text);
         Run(systemctl, "daemon-reload");

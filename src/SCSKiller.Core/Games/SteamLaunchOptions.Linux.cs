@@ -101,7 +101,7 @@ static class SteamLaunchOptions
     internal static string? OffVkd3d(string? options, Func<string, bool> reads)
     {
         var vars = Variables(options, out var unread);
-        if (unread != null) return $"its Steam launch options use env options SCSKiller doesn't read ({unread})";
+        if (unread != null) return $"its Steam launch options use env options Preheat doesn't read ({unread})";
         var env = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach (var (name, value) in vars)
             if (reads(name)) env[name] = value;

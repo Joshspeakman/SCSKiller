@@ -258,7 +258,7 @@ public sealed class ManualSource(AppStore store) : IGameSource, ILeavesOut
         var root = InstallRoot(pick, climb: false);
         // the exe is resolved in the exe's own install root: a climbed one may hold another project's Shipping exe
         var top = found ? root : InstallRoot(pick, climb: true);
-        if (Path.GetPathRoot(root) == root) throw new ArgumentException($"{file} is at the root of a drive: SCSKiller needs the game in a folder of its own.");
+        if (Path.GetPathRoot(root) == root) throw new ArgumentException($"{file} is at the root of a drive: Preheat needs the game in a folder of its own.");
         // as discovery: no import table is read in an install with anti-cheat
         var clean = GameFiles.DetectAntiCheat(new Game("", "", Store.Manual, top, pick)) == AntiCheat.None;
         var graphics = clean ? GameFiles.ImportsGraphics(pick) : null;
@@ -268,7 +268,7 @@ public sealed class ManualSource(AppStore store) : IGameSource, ILeavesOut
             {
                 case [var one]: exe = one; break;
                 case { Count: > 1 } several:
-                    throw new ArgumentException($"{file} looks like a launcher, and SCSKiller can't tell which program it starts: "
+                    throw new ArgumentException($"{file} looks like a launcher, and Preheat can't tell which program it starts: "
                         + string.Join(", ", several.Take(4).Select(Path.GetFileName)) + (several.Count > 4 ? "…" : "")
                         + ". Pick the one that opens the game's window.");
             }
@@ -330,8 +330,8 @@ public sealed class ManualSource(AppStore store) : IGameSource, ILeavesOut
         if (h.IsDll || h.PEHeader == null) throw new ArgumentException($"{file} isn't a Windows program.");
         if (h.CoffHeader.Machine != Machine.Amd64 || h.PEHeader.Magic != PEMagic.PE32Plus)
             throw new ArgumentException(h.CoffHeader.Machine == Machine.I386
-                ? $"{file} is a 32-bit program: SCSKiller compiles 64-bit DirectX 12 games."
-                : $"{file} isn't an x64 program: SCSKiller compiles 64-bit DirectX 12 games.");
+                ? $"{file} is a 32-bit program: Preheat compiles 64-bit DirectX 12 games."
+                : $"{file} isn't an x64 program: Preheat compiles 64-bit DirectX 12 games.");
     }
 
     /// <summary>The folder suggested as the game's (the user confirms or changes it): Unreal's, holding Engine\ and the project

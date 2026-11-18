@@ -102,7 +102,7 @@ public static partial class VulkanLayer
             w.WriteString("library_path", dllPath);
             w.WriteString("api_version", "1.4.303");
             w.WriteString("implementation_version", "1");
-            w.WriteString("description", "SCSKiller's Vulkan recorder");
+            w.WriteString("description", "Preheat's Vulkan recorder");
             w.WriteStartObject("functions");
             w.WriteString("vkGetInstanceProcAddr", "VK_LAYER_fossilize_GetInstanceProcAddr");
             w.WriteString("vkGetDeviceProcAddr", "VK_LAYER_fossilize_GetDeviceProcAddr");

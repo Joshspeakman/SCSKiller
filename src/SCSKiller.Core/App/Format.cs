@@ -28,7 +28,7 @@ public static class Format
     {
         var driver = capped ?? usage.BytesOnDisk;
         var dx11 = capped is { } c ? Math.Max(0, usage.BytesOnDisk - c) : 0;
-        List<string> parts = [$"driver cache {Bytes(driver)}" + (limit is null ? ", limit unknown" : limit.Bytes is { } l ? limit.Ours ? $", SCSKiller gives each game {Bytes(l)}" : $" of its {Bytes(l)} limit" : ", no limit")];
+        List<string> parts = [$"driver cache {Bytes(driver)}" + (limit is null ? ", limit unknown" : limit.Bytes is { } l ? limit.Ours ? $", Preheat gives each game {Bytes(l)}" : $" of its {Bytes(l)} limit" : ", no limit")];
         if (dx11 > 0) parts.Add($"DirectX 11 {Bytes(dx11)}");
         if (windows > 0) parts.Add($"Windows {Bytes(windows)}");
         var lead = Math.Max(total ?? 0, driver + dx11 + windows);
@@ -153,8 +153,8 @@ public static class Format
         {
             GpuVendor.Intel when intel => "Intel support is experimental. DirectX 12 games need a recording first.",
             GpuVendor.Intel => "Intel support is experimental and off. Turn it on in Settings.",
-            GpuVendor.Qualcomm => "SCSKiller doesn't compile on Qualcomm GPUs yet: how Qualcomm's driver caches shaders hasn't been measured.",
-            _ => "SCSKiller doesn't compile on this GPU yet: it only knows how NVIDIA and AMD drivers cache shaders.",
+            GpuVendor.Qualcomm => "Preheat doesn't compile on Qualcomm GPUs yet: how Qualcomm's driver caches shaders hasn't been measured.",
+            _ => "Preheat doesn't compile on this GPU yet: it only knows how NVIDIA and AMD drivers cache shaders.",
         });
 
     /// <summary>A Library row's note: a few words for the status's reason (the whole one is in the row's tooltip and on the
@@ -245,7 +245,7 @@ public static class Format
         : r.StartsWith("the last compile filled the cache of", StringComparison.Ordinal) ? "Compiled for another exe"
         : r.StartsWith("game updated", StringComparison.Ordinal) ? "Game updated"
         : r.StartsWith("game shaders changed", StringComparison.Ordinal) ? "Game shaders changed"
-        : r.StartsWith("SCSKiller can now compile", StringComparison.Ordinal) ? "SCSKiller can compile more"
+        : r.StartsWith("Preheat can now compile", StringComparison.Ordinal) ? "Preheat can compile more"
         : r.StartsWith("Maximum mode", StringComparison.Ordinal) ? "Maximum mode: more to compile"
         : r.Contains(". " + ScsKiller.RedoesNote, StringComparison.Ordinal) ? r
         : Sentence(FirstClause(r));   // "N new pipelines recorded"

@@ -29,13 +29,13 @@ public static class MesaLinux
     /// ANV, NVK and NVIDIA's own driver (also when Vulkan doesn't name NVIDIA's), and for an unknown vendor, whose notice says it.</summary>
     public static string? Refusal(DxgiAdapter a) => (a.Gpu.Vendor, a.Driver) switch
     {
-        (_, Llvmpipe) => "SCSKiller doesn't compile on a software renderer.",
-        (GpuVendor.Amd, AmdOpenSource) => "SCSKiller compiles on AMD GPUs with Mesa's RADV driver, not with AMDVLK.",
-        (GpuVendor.Amd, AmdProprietary) => "SCSKiller compiles on AMD GPUs with Mesa's RADV driver, not with AMD's own Vulkan driver.",
-        (GpuVendor.Nvidia, not (0 or NvidiaProprietary or Nvk)) => "SCSKiller compiles on NVIDIA GPUs with NVIDIA's own driver or Mesa's NVK only.",
-        (GpuVendor.Amd, 0) or (GpuVendor.Intel, 0) => "SCSKiller can't tell which Vulkan driver runs this GPU, so it doesn't compile on it.",
-        (GpuVendor.Amd, not Radv) => "SCSKiller compiles on AMD GPUs with Mesa's RADV driver only.",
-        (GpuVendor.Intel, not Anv) => "SCSKiller compiles on Intel GPUs with Mesa's ANV driver only.",
+        (_, Llvmpipe) => "Preheat doesn't compile on a software renderer.",
+        (GpuVendor.Amd, AmdOpenSource) => "Preheat compiles on AMD GPUs with Mesa's RADV driver, not with AMDVLK.",
+        (GpuVendor.Amd, AmdProprietary) => "Preheat compiles on AMD GPUs with Mesa's RADV driver, not with AMD's own Vulkan driver.",
+        (GpuVendor.Nvidia, not (0 or NvidiaProprietary or Nvk)) => "Preheat compiles on NVIDIA GPUs with NVIDIA's own driver or Mesa's NVK only.",
+        (GpuVendor.Amd, 0) or (GpuVendor.Intel, 0) => "Preheat can't tell which Vulkan driver runs this GPU, so it doesn't compile on it.",
+        (GpuVendor.Amd, not Radv) => "Preheat compiles on AMD GPUs with Mesa's RADV driver only.",
+        (GpuVendor.Intel, not Anv) => "Preheat compiles on Intel GPUs with Mesa's ANV driver only.",
         _ => null,
     };
 

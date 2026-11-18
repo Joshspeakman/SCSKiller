@@ -42,7 +42,7 @@ public static class LaunchArgs
         if (first is "--help" or "-h") { stdout(Usage); return 0; }
         if (CliCommands.All.Contains(first, StringComparer.Ordinal))
         {
-            stderr($"{first} is a command of SCSKiller's CLI\n{Usage}");
+            stderr($"{first} is a command of Preheat's CLI\n{Usage}");
             return 2;
         }
         if (first.StartsWith('-') && !Known.Contains(first, StringComparer.Ordinal) && !KnownPrefixes.Any(p => first.StartsWith(p, StringComparison.Ordinal)))
@@ -62,6 +62,6 @@ public static class LaunchArgs
     [DllImport("kernel32.dll")] static extern bool AttachConsole(int processId);
 
     static string Usage => OperatingSystem.IsWindows()
-        ? "usage: SCSKiller [--version | --help]\nCommands go to the CLI in the app's cli folder: scskiller <command>, for example scskiller status <game>."
-        : "usage: SCSKiller [--version | --help]\nCommands go to the CLI: run this app with --cli <command>, for example --cli status <game>.";
+        ? "usage: Preheat [--version | --help]\nCommands go to the CLI in the app's cli folder: preheat <command>, for example preheat status <game>."
+        : "usage: Preheat [--version | --help]\nCommands go to the CLI: run this app with --cli <command>, for example --cli status <game>.";
 }

@@ -18,12 +18,12 @@ public static class CacheNames
 
     public static (string Title, string Caption) Texts(CacheGroupKind kind, DateTime? installed) => kind switch
     {
-        CacheGroupKind.Installed => ("Installed games", "Games in your library, by the cache keys SCSKiller learned for them."),
-        CacheGroupKind.Uninstalled => ("Uninstalled games", "Games SCSKiller compiled or saw running that aren't in your library now. Named by their exe."),
+        CacheGroupKind.Installed => ("Installed games", "Games in your library, by the cache keys Preheat learned for them."),
+        CacheGroupKind.Uninstalled => ("Uninstalled games", "Games Preheat compiled or saw running that aren't in your library now. Named by their exe."),
         CacheGroupKind.OldDriver => ("Old driver", $"Written before the current driver was installed on {installed?.ToLocalTime():d}. It hasn't used them since."),
-        CacheGroupKind.OldBuild => ("Earlier SCSKiller compiles", "Left by earlier compiles. The games don't read them."),
-        CacheGroupKind.OtherVendor => ("Other GPU vendor", "Caches for another brand of GPU than the one SCSKiller compiles for."),
-        _ => (ScsKiller.OtherApps, "Desktop apps, and games SCSKiller hasn't compiled or seen running. A game moves to its group once SCSKiller sees it running."),
+        CacheGroupKind.OldBuild => ("Earlier Preheat compiles", "Left by earlier compiles. The games don't read them."),
+        CacheGroupKind.OtherVendor => ("Other GPU vendor", "Caches for another brand of GPU than the one Preheat compiles for."),
+        _ => (ScsKiller.OtherApps, "Desktop apps, and games Preheat hasn't compiled or seen running. A game moves to its group once Preheat sees it running."),
     };
 }
 
@@ -254,7 +254,7 @@ public sealed partial class ScsKiller
         // the folders that hold the game items' files: their size is what the items list, never all of Steam's
         var all = items.Values.SelectMany(i => i.Files).ToList();
         CacheFolder Holding(string label, string dir) => Read(dir, out _) with { Label = label, Bytes = all.Where(f => GameFiles.Inside(dir, f.FullName)).Sum(f => f.Length) };
-        if (AppCache is NvidiaLinuxAppCache nl) shown.Add(Holding("Compiled by SCSKiller", nl.GamesDir));
+        if (AppCache is NvidiaLinuxAppCache nl) shown.Add(Holding("Compiled by Preheat", nl.GamesDir));
         var shadercache = $"{SteamSource.AppsPart}{Path.DirectorySeparatorChar}shadercache{Path.DirectorySeparatorChar}";
         foreach (var dir in all.Select(f => f.FullName.IndexOf(shadercache, GameFiles.Names) is var at and >= 0 ? f.FullName[..(at + shadercache.Length - 1)] : null)
             .OfType<string>().Distinct(StringComparer.FromComparison(GameFiles.Names)).Order(StringComparer.Ordinal))
@@ -336,7 +336,7 @@ public sealed partial class ScsKiller
                 : new[] { rec.D3DSCacheExe, rec.RecorderExe }.OfType<string>().Where(Path.IsPathFullyQualified).Select(e => exeFolders.GetValueOrDefault(ExeFolder(e))).FirstOrDefault(o => o != null);
             if (owner != null) folderOwners[id] = owner;
             else if (notes != null && rec.RecorderInstallDir is { } dir && Directory.Exists(dir))
-                notes[name] = $"Its folder {dir} is still there. It may be on a drive or in a store SCSKiller didn't find this time.";
+                notes[name] = $"Its folder {dir} is still there. It may be on a drive or in a store Preheat didn't find this time.";
             Claim(rec, [UninstalledExe(rec), rec.LaunchedExeName, Path.GetFileName(rec.RecorderExe)], CacheGroupKind.Uninstalled, name, id);
         }
         // the key ignores the exe name's path, and on NVIDIA its case (Intel's case is unmeasured): a game with the same exe name reads it too
@@ -680,9 +680,9 @@ public sealed partial class ScsKiller
 
     /// <summary>The "Clear everything" warning: every game compiles again, and whether Other apps and games is included.</summary>
     public static string EverythingWarning(CacheInventory inv, bool withOthers) =>
-        $"Deletes {Format.Bytes(inv.Everything(withOthers).Sum(i => i.Bytes))}. Every game compiles its shaders again. Games SCSKiller compiled stutter until you compile them again, and the rest build "
+        $"Deletes {Format.Bytes(inv.Everything(withOthers).Sum(i => i.Bytes))}. Every game compiles its shaders again. Games Preheat compiled stutter until you compile them again, and the rest build "
         + "their cache as you play. " + (withOthers
-            ? $"The {OtherApps.ToLowerInvariant()} group ({Format.Bytes(inv.Bytes(CacheGroupKind.Unattributed))}) is included: apps and games outside SCSKiller build their caches again too."
+            ? $"The {OtherApps.ToLowerInvariant()} group ({Format.Bytes(inv.Bytes(CacheGroupKind.Unattributed))}) is included: apps and games outside Preheat build their caches again too."
             : $"The {OtherApps.ToLowerInvariant()} group ({Format.Bytes(inv.Bytes(CacheGroupKind.Unattributed))}) is kept unless you tick it.");
 
     /// <summary>The D3DSCache folders of the games running now, whose dbs the runtime holds open: never read.</summary>

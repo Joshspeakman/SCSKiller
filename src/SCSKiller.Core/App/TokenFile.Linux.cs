@@ -14,7 +14,7 @@ public sealed partial class TokenFile<T>
 
     string Name => Path.GetFileName(path);
 
-    static Dictionary<string, string> Attributes(string id) => new() { ["application"] = "SCSKiller", ["scskiller-token"] = id };
+    static Dictionary<string, string> Attributes(string id) => new() { ["application"] = "Preheat", ["scskiller-token"] = id };
 
     /// <summary>Null when there is none or it is damaged (a Windows DPAPI file too), left as it is. A file another user
     /// could read or change, or that isn't this user's own regular file, is never read: <paramref name="refused"/> says

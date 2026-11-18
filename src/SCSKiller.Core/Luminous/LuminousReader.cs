@@ -41,8 +41,8 @@ public sealed class LuminousReader : IEngineReader
         var shadergen = GameFiles.Find(game.InstallDir, Shadergen);
         if (Earc.VersionOf(shadergen) is not { } v) return null;
         // the API is FINAL FANTASY XV's: another Luminous game (Forspoken runs on D3D12) isn't read as one
-        var unsupported = v != Earc.Version ? "an archive version SCSKiller doesn't read"
-            : !File.Exists(GameFiles.Find(game.InstallDir, Exe)) ? "a Luminous game SCSKiller doesn't read" : null;
+        var unsupported = v != Earc.Version ? "an archive version Preheat doesn't read"
+            : !File.Exists(GameFiles.Find(game.InstallDir, Exe)) ? "a Luminous game Preheat doesn't read" : null;
         return new EngineInfo(Family, $"EARC {v >> 16}.{v & 0xFFFF}", null, "D3D11", false, unsupported);
     }
 

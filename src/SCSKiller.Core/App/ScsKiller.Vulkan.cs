@@ -17,7 +17,7 @@ public sealed partial class ScsKiller
 
     public const string SteamPrecachingNote = "stopped while Steam processes this game's shaders: it goes on after";
 
-    public const string VulkanOtherNote = "another SCSKiller copy's Vulkan recorder is registered for this game, so this one isn't installed";
+    public const string VulkanOtherNote = "another Preheat copy's Vulkan recorder is registered for this game, so this one isn't installed";
 
     public const string ElevatedSessionNote = "The game ran as administrator, where the Vulkan recorder can't load. Start it without admin rights.";
 
@@ -31,7 +31,7 @@ public sealed partial class ScsKiller
     {
         if (s is not { ApiOverride: DxApi.Vulkan, ApiDetected: { } detected } || ApiKey(detected) is not { } key || key == "vk") return null;
         var dx = key switch { "11" => "DirectX 11", "12" => "DirectX 12", _ => "DirectX" };
-        return (detected.EndsWith("(last run)", StringComparison.Ordinal) ? $"The game last ran on {dx}." : $"SCSKiller detected {dx} for this game.")
+        return (detected.EndsWith("(last run)", StringComparison.Ordinal) ? $"The game last ran on {dx}." : $"Preheat detected {dx} for this game.")
             + " The recorder only loads if the game runs on Vulkan.";
     }
 
@@ -421,7 +421,7 @@ public sealed partial class ScsKiller
         var ini = IniPath(dir);
         var (iniState, judged) = JudgeOwnIni(g, rec, dir, null);
         if (iniState == IniState.Unknown) throw new IOException($"{ini} can't be read: not installing until it can");
-        if (iniState is not (IniState.Absent or IniState.Ours)) throw new InvalidOperationException($"{ini} is not SCSKiller's: the Vulkan recorder needs its own. Not installing.");
+        if (iniState is not (IniState.Absent or IniState.Ours)) throw new InvalidOperationException($"{ini} is not Preheat's: the Vulkan recorder needs its own. Not installing.");
         (rec.RecorderExe, rec.RecorderInstallDir) = (g.ExePath, g.InstallDir);
         StampLedger(dir);   // the layer finds this copy's recorder folder through it
         PlaceLayer(g, rec, manifest, src);
@@ -669,9 +669,9 @@ public sealed partial class ScsKiller
     /// its own that the game never reads. Before a recorded launch (no device yet) the plan asks for one.</summary>
     bool AmdVkUnlearned(GameRecord rec, EngineInfo? engine) => engine is { VulkanOnly: false } e && VulkanPlan.IsVulkan(e) && rec.VulkanDevice != null && AmdVkFile(rec) == "";   // a Hookshot port compiles in its own process
 
-    public const string AmdVkStartOnceReason = "Start the game once so SCSKiller can find its Vulkan cache.";
+    public const string AmdVkStartOnceReason = "Start the game once so Preheat can find its Vulkan cache.";
     /// <summary>Its file is learned only in a session recorded at the user's own risk (<see cref="StartRiskSession"/>).</summary>
-    public const string AmdVkAntiCheatReason = "This game contains anti-cheat, so enabling the recorder there is at your own risk, and SCSKiller isn't responsible for bans.";
+    public const string AmdVkAntiCheatReason = "This game contains anti-cheat, so enabling the recorder there is at your own risk, and Preheat isn't responsible for bans.";
 
     /// <summary>The variables Steam's launches set for the app's folder <paramref name="dir"/> (<see cref="VulkanPlan.SteamCache"/>), as recorded.</summary>
     static Dictionary<string, string> SteamCacheVars(GpuVendor vendor, string dir) => vendor == GpuVendor.Nvidia

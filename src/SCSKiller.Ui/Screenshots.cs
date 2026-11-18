@@ -77,7 +77,7 @@ static partial class Screenshots
         if (!aesOnly)
         {
             // An alpha build's gate, started on an empty data folder as a first run, then each refusal.
-            var empty = Path.Combine(Path.GetTempPath(), $"SCSKiller-gate-{Environment.ProcessId}");
+            var empty = Path.Combine(Path.GetTempPath(), $"Preheat-gate-{Environment.ProcessId}");
             var gate = new GateWindow(new Account(empty), empty, () => throw new InvalidOperationException("an empty data folder opened the gate"));
             gate.Show();
             await gate.StartAsync();

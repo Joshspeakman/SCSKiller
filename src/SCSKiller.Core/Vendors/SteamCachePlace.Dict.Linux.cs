@@ -288,7 +288,7 @@ sealed partial class SteamCachePlace
                 if (copies.TryGetValue(Key.Of(r.Key), out var c))
                 {
                     if (Whole(c.From.Existing.Bin!, c.Record) is not { } have || !GlCacheFile.Checks(have, c.Record) || GlCacheFile.FrameDictId(have.AsSpan(GlCacheFile.EntryHeaderSize)) != dict.Id)
-                        throw new Refused(SteamPlaceState.Failed, $"an entry of SCSKiller's in {c.From.Target.Name} isn't one it placed under the dictionary {dict.Id:x8}");
+                        throw new Refused(SteamPlaceState.Failed, $"an entry of Preheat's in {c.From.Target.Name} isn't one it placed under the dictionary {dict.Id:x8}");
                     entries[i] = have;
                     Interlocked.Increment(ref stats.Copied);
                     return w;
@@ -508,7 +508,7 @@ sealed partial class SteamCachePlace
                 {
                     // one with the id of SCSKiller's but other bytes is never put in its place
                     if (recordedIds.Contains(id) && !recorded.Contains(Convert.ToHexString(SHA256.HashData(entry.AsSpan(GlCacheFile.EntryHeaderSize)))))
-                        throw new Refused(SteamPlaceState.Failed, $"{o.Target.Name} holds a dictionary with the id of SCSKiller's, {id:x8}, that isn't the one it recorded: left as it is");
+                        throw new Refused(SteamPlaceState.Failed, $"{o.Target.Name} holds a dictionary with the id of Preheat's, {id:x8}, that isn't the one it recorded: left as it is");
                     steamIds.Add(id);
                     // a file SCSKiller writes would carry the other
                     if (steam != null && !entry.AsSpan().SequenceEqual(steam.Entry)) problem ??= $"Steam's files hold two dictionaries, {steam.Id:x8} and {id:x8}";
@@ -525,19 +525,19 @@ sealed partial class SteamCachePlace
         if (ours.Count > 0 && ours.Where(id => Framed(Staying(outs, files.Files), id)).ToList() is [var first, ..] needed)
         {
             if (needed.Count > 1 || current?.D.Id != first && kept.All(d => d.Id != first))
-                throw new Refused(SteamPlaceState.Failed, $"the game's entries in Steam's folder use a dictionary of SCSKiller's, {first:x8}, that it has no record of: left as it is");
+                throw new Refused(SteamPlaceState.Failed, $"the game's entries in Steam's folder use a dictionary of Preheat's, {first:x8}, that it has no record of: left as it is");
             if (problem != null || steam != null)
-                throw new Refused(SteamPlaceState.Failed, $"the game's entries in Steam's folder use SCSKiller's dictionary {first:x8}, which can't stay the leaf's "
+                throw new Refused(SteamPlaceState.Failed, $"the game's entries in Steam's folder use Preheat's dictionary {first:x8}, which can't stay the leaf's "
                     + $"({problem ?? $"Steam's files hold {steam!.Id:x8}"}): left as it is");
             return kept.FirstOrDefault(d => d.Id == first) ?? current?.Entry ?? PlacedDictionary(m, dir, outs, key)
-                ?? throw new Refused(SteamPlaceState.Failed, $"the game's entries in Steam's folder use SCSKiller's dictionary {first:x8}, which can't be had: left as it is");
+                ?? throw new Refused(SteamPlaceState.Failed, $"the game's entries in Steam's folder use Preheat's dictionary {first:x8}, which can't be had: left as it is");
         }
         if (problem != null) throw new NoDictionary(problem);
         if (steam != null)
         {
             // never another than one SCSKiller placed: its entries go in stored, and it stays where it is
             if (kept.FirstOrDefault(d => d.Hash != steam.Hash) is { } placed)
-                throw new NoDictionary($"Steam's files hold {steam.Id:x8}, and SCSKiller's dictionary {placed.Id:x8} stays in the leaf");
+                throw new NoDictionary($"Steam's files hold {steam.Id:x8}, and Preheat's dictionary {placed.Id:x8} stays in the leaf");
             return steam;
         }
         if ((kept.FirstOrDefault() ?? current?.Entry ?? PlacedDictionary(m, dir, outs, key)) is { } had) return had;
@@ -614,9 +614,9 @@ sealed partial class SteamCachePlace
     {
         var (before, after) = (Dictionaries(outs, recorded, written: false), Dictionaries(outs, recorded, written: true, dict));
         if (before.FirstOrDefault(b => b.Hash != null && after.All(a => a.Hash != b.Hash)) is { Hash: not null } lost)
-            throw new Refused(SteamPlaceState.Failed, $"SCSKiller's dictionary {lost.Id:x8} would leave the leaf: left as it is");
+            throw new Refused(SteamPlaceState.Failed, $"Preheat's dictionary {lost.Id:x8} would leave the leaf: left as it is");
         if (before.FirstOrDefault() is { Hash: { } first } was && after.FirstOrDefault().Hash != first)
-            throw new Refused(SteamPlaceState.Failed, $"SCSKiller's dictionary {was.Id:x8} would stop being the leaf's: left as it is");
+            throw new Refused(SteamPlaceState.Failed, $"Preheat's dictionary {was.Id:x8} would stop being the leaf's: left as it is");
     }
 
     /// <summary>SCSKiller's dictionary in the leaf as <see cref="HeldDictionary"/> has it, with its entry when read from a file
@@ -626,7 +626,7 @@ sealed partial class SteamCachePlace
         if (HeldDictionary(m, note, dir, outs) is not { } held) return null;
         if (held.Entry == null) return (held.D, null);
         if (AsDictionary(held.Entry, key, FromKept) is not { } kept || kept.Id != held.D.Id || kept.Hash != held.D.Hash)
-            throw new Refused(SteamPlaceState.Failed, "the cache SCSKiller placed in Steam's folder can't be checked: left as it is");
+            throw new Refused(SteamPlaceState.Failed, "the cache Preheat placed in Steam's folder can't be checked: left as it is");
         return (held.D, kept);
     }
 
@@ -646,7 +646,7 @@ sealed partial class SteamCachePlace
                 var entry = r.Length <= MaxEntry ? Whole(o.Existing.Bin!, r) : null;
                 var hash = entry != null && GlCacheFile.Checks(entry, r) ? Convert.ToHexString(SHA256.HashData(entry.AsSpan(GlCacheFile.EntryHeaderSize))) : null;
                 if (new[] { m.WasDictionary, m.Dictionary }.FirstOrDefault(x => x != null && x.Hash == hash) is not { } was || held is { } h && h.D.Hash != was.Hash)
-                    throw new Refused(SteamPlaceState.Failed, $"SCSKiller's dictionary entry in {o.Target.Name} isn't the one it recorded");
+                    throw new Refused(SteamPlaceState.Failed, $"Preheat's dictionary entry in {o.Target.Name} isn't the one it recorded");
                 held ??= (was, entry);
             }
             if (held != null) return held;
@@ -659,7 +659,7 @@ sealed partial class SteamCachePlace
         if (dicts is not [var one] || own.Existing.Bin is not { } bin || one.Length > MaxEntry || Whole(bin, one) is not { } kept || !GlCacheFile.Checks(kept, one)
             || GlCacheFile.DictionaryId(kept.AsSpan(GlCacheFile.EntryHeaderSize)) is not { } id
             || Convert.ToHexString(SHA256.HashData(kept.AsSpan(GlCacheFile.EntryHeaderSize))) is var sha && !named.Contains(((uint?)id, (string?)sha)))
-            throw new Refused(SteamPlaceState.Failed, "the cache SCSKiller placed in Steam's folder can't be checked: left as it is");
+            throw new Refused(SteamPlaceState.Failed, "the cache Preheat placed in Steam's folder can't be checked: left as it is");
         return (new(id, sha, BinaryPrimitives.ReadUInt64LittleEndian(kept.AsSpan(20)), one.Size, FromKept, 0), kept);
     }
 
@@ -805,7 +805,7 @@ sealed partial class SteamCachePlace
             var merged = outs.FirstOrDefault(x => x.Target.SteamFirst && !x.Kept && x.Existing is { Exists: true, Broken: null, Bin: not null });
             if (merged == null || !merged.Write && merged.Existing.Sums(out _) == null)
             {
-                if (!removal) throw new Refused(SteamPlaceState.Failed, $"SCSKiller's dictionary {id:x8} has no file of Steam's to stay in: left as it is");
+                if (!removal) throw new Refused(SteamPlaceState.Failed, $"Preheat's dictionary {id:x8} has no file of Steam's to stay in: left as it is");
                 var needed = Framed(Staying(outs, files.Files), id);
                 // the game's slot holds no dictionary: a merged file of the dictionary alone is where its entries read it
                 merged = needed ? outs.FirstOrDefault(x => x.Target.SteamFirst && !x.Kept && !x.Existing.Exists) : null;
@@ -824,12 +824,12 @@ sealed partial class SteamCachePlace
             }
             merged.Carried.Add((o.Existing.Bin!, r));
             merged.End += r.Length;
-            lines.Add($"{merged.Target.Name}: SCSKiller's dictionary {id:x8} goes there, the leaf keeps it");
+            lines.Add($"{merged.Target.Name}: Preheat's dictionary {id:x8} goes there, the leaf keeps it");
         }
         if (Dictionaries(outs, recorded, written: false).FirstOrDefault() is { Hash: { } first, Id: { } was }
             && Dictionaries(outs, recorded, written: true).FirstOrDefault() is var now && now.Hash != first)
         {
-            if (!removal) throw new Refused(SteamPlaceState.Failed, $"SCSKiller's dictionary {was:x8} would stop being the leaf's: left as it is");
+            if (!removal) throw new Refused(SteamPlaceState.Failed, $"Preheat's dictionary {was:x8} would stop being the leaf's: left as it is");
             if (Framed(Staying(outs, files.Files), was)) DropFramed(files, outs, was, tracked: true);
         }
         foreach (var line in lines) Log?.Invoke(line);
@@ -924,7 +924,7 @@ sealed partial class SteamCachePlace
         if (!File.Exists(path)) return null;
         var kept = IsFile(path) && new FileInfo(path).Length is > GlCacheFile.EntryHeaderSize and <= MaxEntry ? AsDictionary(File.ReadAllBytes(path), key, FromKept) : null;
         if (kept == null || kept.Hash != d.Hash || kept.Sum != d.Sum || kept.Size != d.Size)
-            throw new Refused(SteamPlaceState.Failed, $"{Path.GetFileName(path)} isn't the dictionary SCSKiller recorded for the leaf");
+            throw new Refused(SteamPlaceState.Failed, $"{Path.GetFileName(path)} isn't the dictionary Preheat recorded for the leaf");
         return kept;
     }
 
@@ -939,7 +939,7 @@ sealed partial class SteamCachePlace
             {
                 var placed = r.Length <= MaxEntry && Whole(o.Existing.Bin!, r) is { } e ? AsDictionary(e, key, FromKept) : null;
                 if (placed == null || placed.Hash != d.Hash || placed.Sum != d.Sum)
-                    throw new Refused(SteamPlaceState.Failed, $"SCSKiller's dictionary entry in {o.Target.Name} isn't the one it recorded");
+                    throw new Refused(SteamPlaceState.Failed, $"Preheat's dictionary entry in {o.Target.Name} isn't the one it recorded");
                 found ??= placed;
             }
         return found;
@@ -1067,7 +1067,7 @@ sealed partial class SteamCachePlace
                 if (entry != null && GlCacheFile.Checks(entry, r) && r.Key.AsSpan().SequenceEqual(DictKey(e.BinHeader)) && r.Size == d.Size && sum == d.Sum
                     && Convert.ToHexString(SHA256.HashData(entry.AsSpan(GlCacheFile.EntryHeaderSize))) == d.Hash)
                     held = true;
-                else if (own || mine.Contains(new(Key.Of(r.Key), sum))) throw new Refused(SteamPlaceState.Failed, $"SCSKiller's dictionary entry in {f.Name} isn't the one it recorded");
+                else if (own || mine.Contains(new(Key.Of(r.Key), sum))) throw new Refused(SteamPlaceState.Failed, $"Preheat's dictionary entry in {f.Name} isn't the one it recorded");
                 else return false;
             }
             if (f.Dictionary && !held) return false;
@@ -1084,7 +1084,7 @@ sealed partial class SteamCachePlace
             if (mine[i] && e.Records[i].IsDictionary && e.Bin is { } bin && IsRecorded(bin, e.Records[i], recorded))
             {
                 mine[i] = false;
-                Log?.Invoke($"{name}: SCSKiller's dictionary stays there, the leaf keeps it");
+                Log?.Invoke($"{name}: Preheat's dictionary stays there, the leaf keeps it");
             }
     }
 
@@ -1108,7 +1108,7 @@ sealed partial class SteamCachePlace
                     Libc.SetThreadIoPriority(idle ? Libc.IoPriorityIdle : Libc.IoPriorityLowest);
                     _owner = this;
                     foreach (var task in _tasks.GetConsumingEnumerable()) TryExecuteTask(task);
-                }) { IsBackground = true, Name = "SCSKiller encode" };
+                }) { IsBackground = true, Name = "Preheat encode" };
                 t.Start();
                 _threads.Add(t);
             }

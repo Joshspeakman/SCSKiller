@@ -341,7 +341,7 @@ public sealed class Community
                 else checkedPsos = CheckPacked(packed, out file, full, aftermath);
                 if (checkedPsos is not { } psos)
                 {
-                    Problem = "A community recording this version can't read was ignored. An update of SCSKiller may fix it.";
+                    Problem = "A community recording this version can't read was ignored. An update of Preheat may fix it.";
                     return null;
                 }
                 var got = new CommunityDownload(obj, contentHash, psos, clock.GetUtcNow(), visibility, full,
@@ -399,7 +399,7 @@ public sealed class Community
             try { pack = MiddlewarePacks.FromShared(HashOnly.CheckPack(HashOnly.Canonical(HashOnly.Decompress(packed, MaxRaw), local: false, out _, HashOnly.MaxEntryStateObjectRefs, maxRecords: HashOnly.MaxEntryRecords)), dll, image, amd, e.Object, out _); }
             catch (InvalidDataException)
             {
-                Problem = "An upscaler pack this version can't read was ignored. An update of SCSKiller may fix it.";
+                Problem = "An upscaler pack this version can't read was ignored. An update of Preheat may fix it.";
                 return null;
             }
             if (wanted?.Invoke() == false) return null;
@@ -610,8 +610,8 @@ public sealed class Community
         HttpRequestException => "Can't reach the community database right now. Compiling works as usual from your own files.",
         OperationCanceledException => "The community database didn't answer in time. It retries at the next scan.",
         AccountException => e.Message,
-        InvalidDataException => "The community database sent a list this version can't read. An update of SCSKiller may fix it.",
-        _ => "The community database gave an answer this version doesn't understand. An update of SCSKiller may fix it.",
+        InvalidDataException => "The community database sent a list this version can't read. An update of Preheat may fix it.",
+        _ => "The community database gave an answer this version doesn't understand. An update of Preheat may fix it.",
     };
 
     internal static T? Read<T>(string path) where T : class

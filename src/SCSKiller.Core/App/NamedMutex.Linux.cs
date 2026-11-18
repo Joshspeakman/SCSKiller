@@ -49,14 +49,14 @@ static partial class NamedMutex
                         _made = made;
                         return _root = root;
                     }
-                    why = $"The locks are in {actual}, not in {root} where SCSKiller checks them";
+                    why = $"The locks are in {actual}, not in {root} where Preheat checks them";
                     return null;
                 }
-            why = "The folder where SCSKiller keeps its locks can't be found: /proc/self/fd doesn't show it";
+            why = "The folder where Preheat keeps its locks can't be found: /proc/self/fd doesn't show it";
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            why = $"The folder where SCSKiller keeps its locks can't be found: {e.Message.TrimEnd(';', ' ').Replace("; ", ", ")}";   // a line users see
+            why = $"The folder where Preheat keeps its locks can't be found: {e.Message.TrimEnd(';', ' ').Replace("; ", ", ")}";   // a line users see
         }
         return null;
     }
@@ -72,13 +72,13 @@ static partial class NamedMutex
         if (!string.IsNullOrEmpty(xdg))
         {
             if (Plain(xdg)) return Path.Combine(Path.GetFullPath(xdg), ".dotnet");
-            why = $"XDG_RUNTIME_DIR ({xdg}) isn't a full path without . or .., so SCSKiller has nowhere to keep its locks";   // nor .NET when relative: no fallback
+            why = $"XDG_RUNTIME_DIR ({xdg}) isn't a full path without . or .., so Preheat has nowhere to keep its locks";   // nor .NET when relative: no fallback
             return null;
         }
         if (!Plain(home))
         {
-            why = home.Length == 0 ? "SCSKiller has no home folder to keep its locks in"
-                : $"The home folder ({home}) isn't a full path without . or .., so SCSKiller has nowhere to keep its locks";
+            why = home.Length == 0 ? "Preheat has no home folder to keep its locks in"
+                : $"The home folder ({home}) isn't a full path without . or .., so Preheat has nowhere to keep its locks";
             return null;
         }
         underHome = true;
@@ -118,7 +118,7 @@ static partial class NamedMutex
         {
             if (made != null && d.StartsWith(made + "/", StringComparison.Ordinal)) Libc.MakePrivateDir(d);
             if (OwnPath.Node(d, Libc.EffectiveUserId, p => stat(p) is { } n ? (n.Uid == Unmapped && (n.Mode & 0x12) == 0 ? 0 : n.Uid, n.Mode) : null, acl ?? Libc.AccessAcl, stickyRoot: true) is { } why)
-                return $"The folder where SCSKiller keeps its locks can't be trusted: {why}";
+                return $"The folder where Preheat keeps its locks can't be trusted: {why}";
         }
         return null;
     }
@@ -165,7 +165,7 @@ static partial class NamedMutex
                 _ when Libc.AccessAcl(dir) is var acl and not (Libc.NoData or Libc.NotSupported) => acl == 0 ? "has an ACL" : "has an ACL that can't be read",
                 _ => null,
             };
-            if (why != null) return $"{dir}, where SCSKiller keeps its locks, {why}";
+            if (why != null) return $"{dir}, where Preheat keeps its locks, {why}";
         }
         return null;
     }

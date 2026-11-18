@@ -182,7 +182,7 @@ public sealed class Planner(string? packDir = null, string? sharedPackDir = null
     public const string OwnPipelineCache = "planned from the game's own pipeline cache";
 
     /// <summary>AMD's Windows driver keeps DirectX 9 shaders in its cache by exe name, NVIDIA's keeps none (both measured).</summary>
-    public const string Dx9AmdReason = "runs on DirectX 9: compiling it waits for SCSKiller's DirectX 9 compile on AMD";
+    public const string Dx9AmdReason = "runs on DirectX 9: compiling it waits for Preheat's DirectX 9 compile on AMD";
 
     static string Dx9For(string reason, VendorCaps caps) => reason == CarvedReader.Dx9Reason && caps.Profile == "amd-1" ? Dx9AmdReason : reason;
 

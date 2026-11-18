@@ -79,11 +79,11 @@
 
             <Grid x:Name="Header" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="16">
                 <WrapPanel x:Name="HeaderButtons" Grid.Column="2" ItemSpacing="8" LineSpacing="8" VerticalAlignment="Center">
-                    <Button Content="Rename…" Click="OnRename" IsVisible="{Binding IsManual}" ToolTip.Tip="The name SCSKiller shows for this game" />
+                    <Button Content="Rename…" Click="OnRename" IsVisible="{Binding IsManual}" ToolTip.Tip="The name Preheat shows for this game" />
                     <Button Content="Game folder…" Click="OnGameFolder" IsVisible="{Binding IsManual}"
-                            ToolTip.Tip="The folder SCSKiller checks for anti-cheat before it records this game" />
-                    <Button Content="Game exe…" Click="OnGameExe" IsVisible="{Binding CanChooseExe}" ToolTip.Tip="Choose the exe SCSKiller compiles and records for" />
-                    <Button Content="Auto exe" Click="OnAutoExe" IsVisible="{Binding ExeChosen}" ToolTip.Tip="Go back to the exe SCSKiller picks" />
+                            ToolTip.Tip="The folder Preheat checks for anti-cheat before it records this game" />
+                    <Button Content="Game exe…" Click="OnGameExe" IsVisible="{Binding CanChooseExe}" ToolTip.Tip="Choose the exe Preheat compiles and records for" />
+                    <Button Content="Auto exe" Click="OnAutoExe" IsVisible="{Binding ExeChosen}" ToolTip.Tip="Go back to the exe Preheat picks" />
                     <Button Content="Open folder" Click="OnOpenExeFolder" ToolTip.Tip="Open the folder of the game's exe" />
                     <Button Content="Remove from library" Click="OnRemoveGame" ToolTip.Tip="{Binding RemoveTip}" />
                     <Panel Background="Transparent" ToolTip.Tip="{Binding PlayTip}" IsVisible="{Binding ShowPlay}">
@@ -147,10 +147,10 @@
                             <TextBlock Classes="Icon" Text="{x:Static ui:Glyphs.Refresh}" FontSize="18" VerticalAlignment="Center" />
                         </Button>
                         <!-- tooltip on a hit-testable wrapper: a disabled button shows none -->
-                        <Panel Background="Transparent" ToolTip.Tip="{Binding ReportTip}">
+                        <Panel Background="Transparent" ToolTip.Tip="{Binding ReportTip}" IsVisible="False"><!-- Preheat: ratings would go to SCSKiller's server -->
                             <Button Content="Rate this compile" Click="OnSendReport" IsEnabled="{Binding CanReport}" />
                         </Panel>
-                        <Button Content="Report a problem" Click="OnReportProblem" ToolTip.Tip="Send the SCSKiller team what went wrong with this game" />
+                        <!-- Preheat: problem reports went to the SCSKiller team; Preheat's bugs are reported on its GitHub (About) -->
                         <Panel Background="Transparent" ToolTip.Tip="{Binding ClearCacheTip}" IsVisible="{Binding ShowClearCache}">
                             <Button Content="{Binding ClearCacheText}" Click="OnClearCache" IsEnabled="{Binding CanClearCache}" />
                         </Panel>

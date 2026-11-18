@@ -1,10 +1,10 @@
 ﻿<#
 .SYNOPSIS
-Builds dist\SCSKiller\ and dist\SCSKiller.zip:
+Builds dist\Preheat\ and dist\Preheat.zip:
 
-  SCSKiller.exe            the app (src\SCSKiller.Ui, Avalonia), self-contained (.NET + Windows App SDK Foundation), + oodle-data-shared.dll, zlib-ng2.dll, the VC++ runtime (VC-REDIST.txt)
-  cli\scskiller.exe        command line, self-contained, same Core project and commit, + the two codec DLLs and the VC++ runtime
-  cli\scskillerw.exe       the same CLI flagged as a GUI-subsystem exe: what the scheduled task runs (no console window)
+  Preheat.exe            the app (src\SCSKiller.Ui, Avalonia), self-contained (.NET + Windows App SDK Foundation), + oodle-data-shared.dll, zlib-ng2.dll, the VC++ runtime (VC-REDIST.txt)
+  cli\preheat.exe        command line, self-contained, same Core project and commit, + the two codec DLLs and the VC++ runtime
+  cli\preheatw.exe       the same CLI flagged as a GUI-subsystem exe: what the scheduled task runs (no console window)
   native\                  scskiller_warm.exe + the proxy d3d12.dll + the DirectX 9 recorder d3d9.dll (x86\ for 32-bit
                            games) (the app looks in native\, the CLI in ..\native\)
                            + scskiller_ags.dll (the same recorder as an AMD AGS wrapper, installed as a game's amd_ags_x64.dll)
@@ -15,7 +15,7 @@ Builds dist\SCSKiller\ and dist\SCSKiller.zip:
                            + preload\winmm.dll, version.dll, dinput8.dll (the recorder's preloader in Streamline games)
   THIRD-PARTY-NOTICES.md   every third-party component and its licence; notices\ holds the Microsoft packages' own notices
 
-The CLI can't sit next to the app: scskiller.exe and SCSKiller.exe are the same file name on NTFS.
+The CLI can't sit next to the app: preheat.exe and Preheat.exe are the same file name on NTFS.
 
 -NoOodle leaves oodle-data-shared.dll out (CI and anything published: Oodle is proprietary, redistribution not
 established, THIRD-PARTY-NOTICES.md); UnrealReader and the FromSoft reader download it through CUE4Parse on first use.
@@ -50,7 +50,7 @@ $dotnet = Join-Path $env:LOCALAPPDATA "Microsoft\dotnet\dotnet.exe"   # .NET 10 
 if ($env:DOTNET_ROOT -and (Test-Path (Join-Path $env:DOTNET_ROOT "dotnet.exe"))) { $dotnet = Join-Path $env:DOTNET_ROOT "dotnet.exe" }
 if (-not (Test-Path $dotnet)) { $dotnet = "dotnet" }
 $dist = Join-Path $repo "dist"
-$out = Join-Path $dist "SCSKiller"
+$out = Join-Path $dist "Preheat"
 $cli = Join-Path $out "cli"
 $native = Join-Path $out "native"
 
@@ -84,7 +84,7 @@ Run cmake @("--build", $build86, "--config", "Release")
 New-Item -ItemType Directory -Force (Join-Path $native "x86") | Out-Null
 Copy-Item (Join-Path $build "Release\d3d9.dll") $native
 Copy-Item (Join-Path $build86 "Release\d3d9.dll") (Join-Path $native "x86")
-if ($NativeOnly) { KeyScan @($native); Write-Host "dist\SCSKiller\native only"; return }
+if ($NativeOnly) { KeyScan @($native); Write-Host "dist\Preheat\native only"; return }
 
 # 2. app + CLI
 # the SDK reuses obj\...\apphost.exe until the assembly changes, so a CETCompat change alone would ship the old flag
@@ -96,17 +96,17 @@ Get-ChildItem $out -Filter *.pdb | Remove-Item
 Run $dotnet (@("publish", (Join-Path $repo "src\SCSKiller.Cli\SCSKiller.Cli.csproj"), "-c", $Configuration, "-r", "win-x64",
     "--self-contained", "true", "-o", $cli) + $versionArgs)
 
-# 3. scskillerw.exe: optional header Subsystem (e_lfanew + 24 + 68) 3 = console -> 2 = GUI, as the SDK does for WinExe.
+# 3. preheatw.exe: optional header Subsystem (e_lfanew + 24 + 68) 3 = console -> 2 = GUI, as the SDK does for WinExe.
 #    The apphost still runs scskiller.dll from the same folder.
-$bytes = [IO.File]::ReadAllBytes((Join-Path $cli "scskiller.exe"))
+$bytes = [IO.File]::ReadAllBytes((Join-Path $cli "preheat.exe"))
 $subsystem = [BitConverter]::ToInt32($bytes, 0x3C) + 24 + 68
-if ($bytes[$subsystem] -ne 3) { throw "scskiller.exe: unexpected PE subsystem $($bytes[$subsystem])" }
+if ($bytes[$subsystem] -ne 3) { throw "preheat.exe: unexpected PE subsystem $($bytes[$subsystem])" }
 $bytes[$subsystem] = 2
-[IO.File]::WriteAllBytes((Join-Path $cli "scskillerw.exe"), $bytes)
+[IO.File]::WriteAllBytes((Join-Path $cli "preheatw.exe"), $bytes)
 
 # 3b. no .NET exe may be CET-compatible (Directory.Build.props): the flag is bit 0 of the data of the debug directory entry of
 #     type 20 (IMAGE_DEBUG_TYPE_EX_DLLCHARACTERISTICS). PE32+: the debug directory is data directory 6, at optional header + 160.
-foreach ($exe in "SCSKiller.exe", "cli\scskiller.exe", "cli\scskillerw.exe") {
+foreach ($exe in "Preheat.exe", "cli\preheat.exe", "cli\preheatw.exe") {
     $b = [IO.File]::ReadAllBytes((Join-Path $out $exe))
     $pe = [BitConverter]::ToInt32($b, 0x3C)
     $opt = $pe + 24
@@ -131,8 +131,8 @@ foreach ($exe in "SCSKiller.exe", "cli\scskiller.exe", "cli\scskillerw.exe") {
 #    never the app's data folder: fetch-codecs keeps the pinned copies there (Codecs.Pinned), downloads one that is
 #    missing or doesn't match, and fails the build when no copy matches
 $codecs = @(if (-not $NoOodle) { "oodle-data-shared.dll" }) + "zlib-ng2.dll"
-$cache = Join-Path ([Environment]::GetFolderPath("LocalApplicationData")) "SCSKiller-build\codecs"
-Run (Join-Path $cli "scskiller.exe") @("fetch-codecs", $cache)
+$cache = Join-Path $dist ".codecs"   # Preheat: beside dist, not in %LOCALAPPDATA%
+Run (Join-Path $cli "preheat.exe") @("fetch-codecs", $cache)
 foreach ($c in $codecs) { Copy-Item (Join-Path $cache $c) $cli; Copy-Item (Join-Path $cache $c) $out }
 
 # 4a. the VC++ runtime next to both executables: libsodium and the codecs import vcruntime140.dll and Windows doesn't
@@ -158,7 +158,7 @@ $crtVersion = $crtVersions[0]
 foreach ($d in $out, $cli) { Copy-Item $crtFiles $d }
 $crtSource = "VC\Redist\MSVC\$redistVersion\x64\$($crt[0].Name)"
 Write-Host "VC++ runtime $crtVersion (app-local): $($crt[0].FullName)"
-[IO.File]::WriteAllText((Join-Path $out "VC-REDIST.txt"), "Microsoft Visual C++ runtime $crtVersion (x64), app-local next to SCSKiller.exe and cli\scskiller.exe: " +
+[IO.File]::WriteAllText((Join-Path $out "VC-REDIST.txt"), "Microsoft Visual C++ runtime $crtVersion (x64), app-local next to Preheat.exe and cli\preheat.exe: " +
     "$(($crtFiles | Split-Path -Leaf) -join ', ')`r`nFrom Visual Studio $vsVersion, $crtSource`r`n")
 
 # 4b. licences: our notices and licence (GPL-3.0-or-later + the section 7 permission), plus the large notice files of the Microsoft packages as shipped
@@ -166,7 +166,7 @@ foreach ($l in "LICENSE", "LICENSE-EXCEPTION.txt") { Copy-Item (Join-Path $repo 
 $nuget = if ($env:NUGET_PACKAGES) { $env:NUGET_PACKAGES } else { Join-Path $env:USERPROFILE ".nuget\packages" }
 New-Item -ItemType Directory -Force (Join-Path $out "notices") | Out-Null
 # versions come from what was actually published (any SDK/runtime of this major or newer builds it)
-$runtime = ((Get-Content (Join-Path $out "SCSKiller.runtimeconfig.json") -Raw | ConvertFrom-Json).runtimeOptions.includedFrameworks |
+$runtime = ((Get-Content (Join-Path $out "Preheat.runtimeconfig.json") -Raw | ConvertFrom-Json).runtimeOptions.includedFrameworks |
     Where-Object name -eq "Microsoft.NETCore.App").version
 $row = "| .NET runtime (self-contained) |"
 $notices = [IO.File]::ReadAllText((Join-Path $repo "THIRD-PARTY-NOTICES.md")) -replace "(?m)^$([regex]::Escape($row)) [^|]* \|", "$row $runtime |"
@@ -192,7 +192,7 @@ foreach ($n in @(
 
 # 5. layout check, including self-contained .NET (no "install .NET" prompt): the runtime next to each exe and
 #    runtimeconfig.json listing includedFrameworks rather than a shared framework
-$expected = "SCSKiller.exe", "oodle-data-shared.dll", "zlib-ng2.dll", "vcruntime140.dll", "VC-REDIST.txt", "cli\scskiller.exe", "cli\scskillerw.exe", "cli\vcruntime140.dll",
+$expected = "Preheat.exe", "oodle-data-shared.dll", "zlib-ng2.dll", "vcruntime140.dll", "VC-REDIST.txt", "cli\preheat.exe", "cli\preheatw.exe", "cli\vcruntime140.dll",
     "cli\oodle-data-shared.dll", "cli\zlib-ng2.dll", "native\scskiller_warm.exe", "native\segheap\scskiller_warm.exe", "native\d3d12.dll", "native\amd_ags_x64.dll", "native\scskiller_ags.dll", "native\fossilize-replay.exe",
     "native\VkLayer_scskiller.dll", "native\d3d9.dll", "native\x86\d3d9.dll", "native\preload\winmm.dll", "native\preload\version.dll", "native\preload\dinput8.dll",
     "hostfxr.dll", "coreclr.dll", "cli\hostfxr.dll", "cli\coreclr.dll", "Microsoft.WindowsAppRuntime.dll",
@@ -201,23 +201,23 @@ $expected = "SCSKiller.exe", "oodle-data-shared.dll", "zlib-ng2.dll", "vcruntime
     "notices\SkiaSharp-THIRD-PARTY-NOTICES.txt", "notices\HarfBuzzSharp-THIRD-PARTY-NOTICES.txt"
 if ($NoOodle) { $expected = $expected | Where-Object { $_ -notlike "*oodle-data-shared.dll" } }
 $missing = $expected | Where-Object { -not (Test-Path (Join-Path $out $_)) }
-if ($missing) { throw "dist\SCSKiller is missing: $($missing -join ', ')" }
-if ($NoOodle -and (Get-ChildItem $out -Recurse -Filter "oodle-data-shared.dll")) { throw "-NoOodle, but oodle-data-shared.dll is in dist\SCSKiller" }
+if ($missing) { throw "dist\Preheat is missing: $($missing -join ', ')" }
+if ($NoOodle -and (Get-ChildItem $out -Recurse -Filter "oodle-data-shared.dll")) { throw "-NoOodle, but oodle-data-shared.dll is in dist\Preheat" }
 if (Get-ChildItem $out -Recurse -Filter "*.pdb") { throw "debug symbols must not be published" }
-foreach ($rc in "SCSKiller.runtimeconfig.json", "cli\scskiller.runtimeconfig.json") {
+foreach ($rc in "Preheat.runtimeconfig.json", "cli\preheat.runtimeconfig.json") {
     if ((Get-Content (Join-Path $out $rc) -Raw) -notmatch '"includedFrameworks"') { throw "$rc is framework-dependent" }
 }
 & (Join-Path $PSScriptRoot "check-vcruntime.ps1") -Dir $out
 
-# 6. zip (with the SCSKiller\ folder at its root)
+# 6. zip (with the Preheat\ folder at its root)
 if (-not $NoZip) {
-    $zip = Join-Path $dist "SCSKiller.zip"
+    $zip = Join-Path $dist "Preheat.zip"
     if (Test-Path $zip) { Remove-Item $zip }
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     [IO.Compression.ZipFile]::CreateFromDirectory($out, $zip, [IO.Compression.CompressionLevel]::Optimal, $true)
 }
 # 7. no game key in the published files or the zip
 KeyScan (@($out) + @(if (-not $NoZip) { $zip }))
-$msg = "dist\SCSKiller: {0:N0} MB" -f ((Get-ChildItem $out -Recurse -File | Measure-Object Length -Sum).Sum / 1MB)
-if (-not $NoZip) { $msg += ", dist\SCSKiller.zip: {0:N0} MB" -f ((Get-Item $zip).Length / 1MB) }
+$msg = "dist\Preheat: {0:N0} MB" -f ((Get-ChildItem $out -Recurse -File | Measure-Object Length -Sum).Sum / 1MB)
+if (-not $NoZip) { $msg += ", dist\Preheat.zip: {0:N0} MB" -f ((Get-Item $zip).Length / 1MB) }
 Write-Host $msg

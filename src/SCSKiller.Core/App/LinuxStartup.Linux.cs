@@ -10,7 +10,7 @@ public static class LinuxStartup
 {
     public const string AppId = MenuEntry.AppId, FileName = AppId + ".desktop";
     // the key that makes an entry ours: a desktop's autostart settings copy the menu entry under this same name
-    const string OwnKey = "X-SCSKiller-Autostart";
+    const string OwnKey = "X-Preheat-Autostart";
 
     /// <summary>$XDG_CONFIG_HOME, else ~/.config: a relative one is ignored, as the XDG spec says.</summary>
     public static string ConfigHome(Func<string, string?> env) =>
@@ -52,7 +52,7 @@ public static class LinuxStartup
         $"""
         [Desktop Entry]
         Type=Application
-        Name=SCSKiller
+        Name=Preheat
         Comment=Compiles your games' shaders into your GPU driver's cache before you play
         Exec={MenuEntry.ExecArg(program)} {WindowsStartup.TrayArg}
         TryExec={program}
@@ -162,7 +162,7 @@ public static class LinuxStartup
         Task<bool?> RequestAsync(bool autostart, IReadOnlyList<string> commandline, string reason);
     }
 
-    public const string PortalReason = "Start SCSKiller when you sign in";
+    public const string PortalReason = "Start Preheat when you sign in";
 
     /// <summary>A Flatpak's apply, which can't read the entry the portal writes: only the user's toggle asks for what it says,
     /// the start asks nothing (the portal keeps the entry, and a desktop's background-apps setting may have removed it).

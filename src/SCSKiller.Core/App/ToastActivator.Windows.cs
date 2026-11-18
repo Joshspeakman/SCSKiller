@@ -8,7 +8,7 @@ namespace SCSKiller.Core.App;
 public static class ToastActivator
 {
     /// <summary>Velopack's shortcuts carry "velopack." + packId as their AUMID, and the toasts of an app started from them too.</summary>
-    public const string VelopackAumid = "velopack.SCSKiller.App";
+    public const string VelopackAumid = "velopack.Preheat.App";
 
     /// <summary>Points the activator of each of <paramref name="aumids"/> at <paramref name="exe"/>, its arguments kept, when
     /// it starts some copy of SCSKiller.exe: another app's class is never touched. <paramref name="classes"/> is
@@ -50,7 +50,7 @@ public static class ToastActivator
     static bool Ours(string command)
     {
         var c = command.Trim();
-        return Path.GetFileName(c[..ExeEnd(c)].Trim('"')).Equals("SCSKiller.exe", StringComparison.OrdinalIgnoreCase);
+        return Path.GetFileName(c[..ExeEnd(c)].Trim('"')).Equals("Preheat.exe", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>Where the exe's path ends in a trimmed command line: its closing quote, else ".exe", else the first space.</summary>

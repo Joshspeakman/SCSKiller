@@ -80,7 +80,7 @@ public sealed partial class ScsKiller : IScsKiller
         if (vendor == GpuVendor.Nvidia && queue.Select(q => q.Estimate).DefaultIfEmpty().Max() is var own && own > max)   // one game alone can't fit
             return perGame
                 ? $"This compile adds about {Math.Round(own / (double)(1L << 30), MidpointRounding.AwayFromZero):0} GB, more than the {App.Format.Bytes(max)} "
-                    + $"SCSKiller's compile folder holds for one game. The rest compiles while you play. {LargeCacheSlower}"
+                    + $"Preheat's compile folder holds for one game. The rest compiles while you play. {LargeCacheSlower}"
                 : $"This compile adds about {Math.Round(own / (double)(1L << 30), MidpointRounding.AwayFromZero):0} GB, more than your {App.Format.Bytes(max)} NVIDIA shader cache limit. "
                 + $"The driver would throw most of it away. Raise the limit in Settings before you compile. {LargeCacheSlower}";
         if (perGame) return LargeCompileWarning(queue, vendor == GpuVendor.Amd ? GpuVendor.Unknown : vendor, ram);   // a per-game cap is never AMD's DxcCache
@@ -92,7 +92,7 @@ public sealed partial class ScsKiller : IScsKiller
     /// <summary>The queue warning's "Raise the limit": a limit the app sets that isn't Unlimited. Unread (null) may still be raised.</summary>
     public static bool CanRaiseCacheLimit(VendorCaps caps, CacheLimit? limit) => caps.CacheSizeConfigurable && limit is not { Bytes: null };
     static readonly byte[] ProxyMarker = "SCSKiller_StartWarm"u8.ToArray();   // an export only our proxy d3d12.dll has
-    const string RecorderIni = "[scskiller]\r\n; written by SCSKiller: record the pipelines this game creates. Removed by 'uninstall recorder'.\r\nmode=record\r\n";
+    const string RecorderIni = "[scskiller]\r\n; written by Preheat: record the pipelines this game creates. Removed by 'uninstall recorder'.\r\nmode=record\r\n";
     static readonly TimeSpan Poll = TimeSpan.FromMilliseconds(500), AttributionInterval = TimeSpan.FromSeconds(3), HeldSampleInterval = TimeSpan.FromSeconds(30);
     // A new SCSKiller version may detect engines or plan differently: cached scan results from another one are redone.
     // "1.0.0+<commit>": the same for the app and the CLI built from one commit (their Core.dll bytes differ, so no MVID). A
@@ -279,14 +279,14 @@ public sealed partial class ScsKiller : IScsKiller
                     _goneSince = null;
                     // the backend is chosen at start: a pick (or one back from being gone) that lands on another adapter needs a restart
                     GpuRestartNote = (Settings.Gpu != null || _startGpu != null) && GpuBackends.Pick(all, Settings.Gpu, Settings.ExperimentalIntel) is { } picked && picked.Gpu.AdapterLuid != now.Gpu.AdapterLuid
-                        ? $"Restart SCSKiller to use {picked.Gpu.Name}" : null;
+                        ? $"Restart Preheat to use {picked.Gpu.Name}" : null;
                     if (now != _known || !_resolved) (_resolved, _known) = (Vendor is not IRefreshableGpu gpu || gpu.Refresh(now.Gpu), now);
                     if (now.Gpu.DriverVersion.Length > 0)   // none: the last one stays
                         _id = $"{(int)now.Gpu.Vendor:x4}:{now.DeviceId:x4}:{now.SubSysId:x8}:{now.Gpu.DriverVersion}";
                     if (_resolved && _id != null) _completeId = _id;
                 }
                 else if (Clock() - (_goneSince ??= Clock()) >= GpuGoneAfter && GpuBackends.Pick(all, Settings.Gpu, Settings.ExperimentalIntel) is { } other)
-                    GpuRestartNote = $"Restart SCSKiller to use {other.Gpu.Name}";
+                    GpuRestartNote = $"Restart Preheat to use {other.Gpu.Name}";
                 if (GpuRestartNote == note && Vendor.Gpu == before && DriverId == id) return false;
             }
             catch (Exception e)
@@ -2238,9 +2238,9 @@ public sealed partial class ScsKiller : IScsKiller
     public const string WineMadeUpNote = "On Linux the recorder can't run in this game yet.";
     /// <summary>The proxy's refusal under out=1 when its out folder can't be made (admit.h kNoOutFolder), also as the first
     /// device's recheck writes it.</summary>
-    const string OutFolderRefusal = "SCSKiller's recorder folder can't hold this game's recordings";
+    const string OutFolderRefusal = "Preheat's recorder folder can't hold this game's recordings";
     const string LateRefusal = " (at the first device, after the early decision)";   // proxy.cpp refused_late
-    internal const string OutFolderNote = "The last launch wasn't recorded: the recorder couldn't save to SCSKiller's data folder.";
+    internal const string OutFolderNote = "The last launch wasn't recorded: the recorder couldn't save to Preheat's data folder.";
 
     static readonly string[] ManifestRefusals = ["VAC: a Steam manifest can't be read: ", "VAC: a Steam manifest is malformed: ", "VAC: a Steam manifest names no single folder and app: "];
 
@@ -2260,7 +2260,7 @@ public sealed partial class ScsKiller : IScsKiller
 
     /// <summary>The proxy's refusals of an ini without a valid stamp for the exe that ran.</summary>
     static bool Unstamped(string? why) =>
-        why is "exe not as checked" or "no install root" or "not signed by SCSKiller" or "not armed by SCSKiller" or "signed by an earlier SCSKiller version";
+        why is "exe not as checked" or "no install root" or "not signed by Preheat" or "not armed by Preheat" or "signed by an earlier Preheat version";
 
     /// <summary><see cref="GameRecord.RtUnseen"/> after the last recorded launch: a ray tracing state object in it clears it, a
     /// launch of <see cref="EnoughRecording"/> without one sets it (ray tracing off in the game: no recording will ever have one).</summary>
@@ -2314,7 +2314,7 @@ public sealed partial class ScsKiller : IScsKiller
     /// <summary>Why a game's ray tracing needs a recording on this PC (<see cref="NeedsRtRecording"/>), for the detail page.</summary>
     public static string RtWhy(VendorCaps caps, EngineInfo? e) => caps.RtCacheGranularity == RtCacheGranularity.WholeObject
         ? "This GPU's driver reuses ray tracing pipelines only exactly as the game builds them, and which ones it builds isn't in its files."
-        : $"SCSKiller can't rebuild {(e is { } x ? Format.Engine(x) : "this engine")}'s ray tracing layout from the game files yet.";
+        : $"Preheat can't rebuild {(e is { } x ? Format.Engine(x) : "this engine")}'s ray tracing layout from the game files yet.";
 
     static string RtBlocked(bool rt, string? noRecording, string reason) => !rt ? reason
         : Format.Then(reason, noRecording != null ? NeedsRecording("ray-traced effects aren't compiled: they need a recording", noRecording) : RtAfterRecordingNote);
@@ -2441,7 +2441,7 @@ public sealed partial class ScsKiller : IScsKiller
     };
 
     /// <summary>The game page's line for a game a risk session would be offered for but for its store (<see cref="GameState.RiskNoLaunch"/>).</summary>
-    public static string NoLaunchNote(string store) => $"No recording session: SCSKiller can't start games from {store}.";
+    public static string NoLaunchNote(string store) => $"No recording session: Preheat can't start games from {store}.";
     /// <summary>An EasyAntiCheat game that an offline session can record (<see cref="OfflineEac"/>), with no recording yet:
     /// NeedsRecording with this reason, "Needs an offline session".</summary>
     public const string OfflineSessionNote = "The game contains anti-cheat: record an offline session on the game page, at your own risk.";
@@ -2544,7 +2544,7 @@ public sealed partial class ScsKiller : IScsKiller
         {
             0 => ": the driver refused their root signatures.",
             1 => ": the driver refused them.",
-            2 => ": SCSKiller couldn't build them from the game's files.",
+            2 => ": Preheat couldn't build them from the game's files.",
             _ => ".",
         };
 
@@ -2618,7 +2618,7 @@ public sealed partial class ScsKiller : IScsKiller
     /// <summary>The game page's row for pipelines the plan of a game on <paramref name="engine"/> leaves out for the cache budget (<see cref="PlanStats.CacheBudgetLeftOut"/>).</summary>
     public static string CacheBudgetTitle(VendorCaps caps, EngineInfo? engine = null, int? capGB = null) => VulkanCap(caps, engine) != null ? $"More than one {PerGameVendor(caps)} shader cache file holds"
         : UserCap(caps, capGB) != null ? "More than this game's compile size limit"
-        : caps.PerGameCacheCap != null && caps.Profile == NvidiaLinux.Profile ? "More than SCSKiller's compile folder holds"
+        : caps.PerGameCacheCap != null && caps.Profile == NvidiaLinux.Profile ? "More than Preheat's compile folder holds"
         : caps.PerGameCacheCap != null ? $"More than the {PerGameVendor(caps)} shader cache keeps per game"
         : "More than the AMD shader cache holds";
 
@@ -2628,12 +2628,12 @@ public sealed partial class ScsKiller : IScsKiller
             : UserCap(caps, capGB) is { } user
             ? $"This game has more pipelines than its compile size limit ({App.Format.Bytes(user)}). "
             : caps.PerGameCacheCap is { } folder && caps.Profile == NvidiaLinux.Profile
-            ? $"This game has more pipelines than SCSKiller's compile folder holds for it ({App.Format.Bytes(folder)}"
+            ? $"This game has more pipelines than Preheat's compile folder holds for it ({App.Format.Bytes(folder)}"
                 + (folder == NvidiaLinux.PlacedCacheSize ? $", {SteamFilesFit}). " : "). ")
             : caps.PerGameCacheCap is { } cap
             ? $"This game has more pipelines than the {PerGameVendor(caps)} driver keeps for one game ({App.Format.Bytes(cap)}). "
             : $"This game has more pipelines than the AMD driver's whole shader cache can hold ({App.Format.Bytes(AmdAppCache.DxcCacheCap)}). ")
-        + "So SCSKiller compiles the ones most likely to be used, recorded ones first. The rest compile while you play."
+        + "So Preheat compiles the ones most likely to be used, recorded ones first. The rest compile while you play."
         + (UserCap(caps, capGB) != null && plan is { Generated: 0, Recorded: > 0 } ? " The recorded pipelines alone are over this limit." : "");
 
     // NvidiaLinux.PlacedCacheSize: what the placer fits in Steam's files, each read up to NvidiaLinux.CacheFileIndexed
@@ -2652,17 +2652,17 @@ public sealed partial class ScsKiller : IScsKiller
             return $"{p.LeftOut:N0} (" + (p.LeftOut > p.DescriptorHeap ? $"{p.LeftOut - p.DescriptorHeap:N0} ray tracing, {p.DescriptorHeap:N0} " : "")
                 + "using descriptor heaps, which the driver reads only from the game's own shader cache)";
         var notSeen = p.LeftOut - p.Uncovered;
-        return $"{p.LeftOut:N0} (" + (notSeen <= 0 ? "shader slots SCSKiller can't rebuild"
-            : p.Uncovered > 0 ? $"{p.Uncovered:N0} for shader slots SCSKiller can't rebuild, {notSeen:N0} not seen in a recording yet"
+        return $"{p.LeftOut:N0} (" + (notSeen <= 0 ? "shader slots Preheat can't rebuild"
+            : p.Uncovered > 0 ? $"{p.Uncovered:N0} for shader slots Preheat can't rebuild, {notSeen:N0} not seen in a recording yet"
             : "not seen in a recording yet") + ")";
     }
 
     /// <summary>The game page's line for a plan whose left-out stage sets no recording showed yet; with a recording the
     /// rule didn't match (<see cref="LearnedOnly"/>), why only what it saw is planned.</summary>
-    public static string NotSeenNote(bool recordOn, PlanStats? p = null) => (LearnedOnly(p) ? LearnedNote + " " : "") + "SCSKiller hasn't seen how the game sets the rest up yet. "
+    public static string NotSeenNote(bool recordOn, PlanStats? p = null) => (LearnedOnly(p) ? LearnedNote + " " : "") + "Preheat hasn't seen how the game sets the rest up yet. "
         + (recordOn ? "Keep playing with recording on. What it sees is added the next time it compiles." : "Playing longer with recording on teaches it.");
 
-    public const string LearnedNote = "Your recording showed this game builds its shaders differently, so SCSKiller compiles the combinations it saw.";
+    public const string LearnedNote = "Your recording showed this game builds its shaders differently, so Preheat compiles the combinations it saw.";
 
     /// <summary>A plan from a recording whose root signatures the engine version's rule didn't rebuild: only the stage sets
     /// the recording showed are planned (PlanBuilder's learned lookup, no rule fallback), most of the rest not seen yet.</summary>
@@ -2684,7 +2684,7 @@ public sealed partial class ScsKiller : IScsKiller
 
     /// <summary>The game page's line for a plan whose left-out stage sets use root signature slots the engine adds.</summary>
     public static string EngineSlotsNote(bool recordOn) => "The rest use shader slots this game's engine adds. "
-        + (recordOn ? "Keep playing with recording on. They're rebuilt the next time it compiles." : "A 5-minute recording lets SCSKiller rebuild them.");
+        + (recordOn ? "Keep playing with recording on. They're rebuilt the next time it compiles." : "A 5-minute recording lets Preheat rebuild them.");
 
     /// <summary>The last compile ended where the game's compile cache held no more (<see cref="GameRecord.WarmedRoomLeft"/>); null when it didn't.</summary>
     static string? RoomNote(GameRecord r) => r.WarmedRoomLeft is not { } left ? null
@@ -2693,8 +2693,8 @@ public sealed partial class ScsKiller : IScsKiller
 
     /// <summary>The status note of a partial plan (<see cref="IsPartial"/>): what it compiles and what would add the rest.</summary>
     public static string? PartialNote(PlanStats? p) => !IsPartial(p) ? null
-        : p!.Recorded == 0 ? $"compiles {p.Generated:N0} pipelines. A 5-minute recording lets SCSKiller rebuild the rest"
-        : $"compiles {p.Recorded + p.Generated:N0} pipelines. {p.Uncovered:N0} more shader combinations use shader slots SCSKiller can't rebuild yet";
+        : p!.Recorded == 0 ? $"compiles {p.Generated:N0} pipelines. A 5-minute recording lets Preheat rebuild the rest"
+        : $"compiles {p.Recorded + p.Generated:N0} pipelines. {p.Uncovered:N0} more shader combinations use shader slots Preheat can't rebuild yet";
 
     /// <summary>A queue line's progress (CLI): " done/total (N failed[, M skipped: not in this install]) rate/s" (reading shaders: " done/total packages",
     /// a plan or file preparation step: " 42.0% done/total shader groups paired", " done recording entries read" while its total is unknown), then for
@@ -2741,13 +2741,13 @@ public sealed partial class ScsKiller : IScsKiller
             {
                 0 => " (the driver refused their root signatures)",
                 1 => " (the driver rejected them)",
-                2 => " (SCSKiller couldn't build them from the game's files)",
+                2 => " (Preheat couldn't build them from the game's files)",
                 _ => "",
             } : null,
             skipped > 0 ? $"{skipped} skipped ({SkippedWhy(plan)})" : null,
             crashed - crashedBefore is > 0 and var crashedNow ? $"{crashedNow} skipped ({(crashedNow == 1 ? "it crashes" : "they crash")} the GPU driver)" : null,
             driverSkipped - known is > 0 and var now ? $"{now} skipped for this compile (the GPU driver crashed, hung or ran out of memory on {(now == 1 ? "it" : "them")} or on what {(now == 1 ? "it builds" : "they build")} on, or {(now == 1 ? "it wasn't" : "they weren't")} tried past a spot where it kept failing)" : null,
-            unbuilt > 0 ? $"{unbuilt} skipped (SCSKiller can't build {(unbuilt == 1 ? "it" : "them")} yet)" : null,
+            unbuilt > 0 ? $"{unbuilt} skipped (Preheat can't build {(unbuilt == 1 ? "it" : "them")} yet)" : null,
             invalid > 0 ? $"{invalid} skipped ({InvalidWhy(invalid)})" : null,
             unsupported > 0 ? $"{unsupported} skipped ({UnsupportedWhy(unsupported)})" : null,
             known + crashedBefore > 0 ? KnownNote(known + crashedBefore) : null,
@@ -3213,9 +3213,9 @@ public sealed partial class ScsKiller : IScsKiller
     /// Under <paramref name="floor"/> and not replacing the last compile: nothing.</summary>
     string? PlannerChanged(GameRecord r, long? planned, EngineInfo? e, long floor) =>
         !CurrentPlanner(r.PlanVersion, r.PlanRules, r.PlanReaderVersion, e) ? (r.PlanCheckFailed == Planner.Version ? PlanCheckFailedReason : null)
-        : planned is not { } n ? "SCSKiller can now compile more of this game"
+        : planned is not { } n ? "Preheat can now compile more of this game"
         : n > 0 ? n * 2 > PlanItems(r.Plan?.Stats) ? $"{PlanReplacedReason} ({n:N0} pipeline{(n == 1 ? "" : "s")})"
-            : n >= floor ? $"SCSKiller can now compile {n:N0} more pipeline{(n == 1 ? "" : "s")} for this game" : null : null;
+            : n >= floor ? $"Preheat can now compile {n:N0} more pipeline{(n == 1 ? "" : "s")} for this game" : null : null;
 
     /// <summary>A rebuilt plan of which more than half is new to the last compile: it replaces that compile rather than adds to it.</summary>
     public const string PlanReplacedReason = "The plan changed, compile again";
@@ -3284,10 +3284,10 @@ public sealed partial class ScsKiller : IScsKiller
         var embedded = RulesFile.Embedded.Hash(e);
         if ((r.PlanRules ?? embedded) == (r.WarmedPlanRules ?? embedded) || r.WarmKeysFile is not { } wf
             || KeyFiles.Set(Path.Combine(Store.GameDir(g.Id), wf)) is not { } warmed || PendingOf(g, r, e).Planned is not { } n || n <= warmed.Count) return null;
-        return $"SCSKiller can now compile {n:N0} more pipeline{(n == 1 ? "" : "s")} for this game: more than its last compile, so not while idle";
+        return $"Preheat can now compile {n:N0} more pipeline{(n == 1 ? "" : "s")} for this game: more than its last compile, so not while idle";
     }
 
-    public const string PlanCheckFailedReason = "SCSKiller couldn't update this game's plan in the background. A compile will update it";
+    public const string PlanCheckFailedReason = "Preheat couldn't update this game's plan in the background. A compile will update it";
 
     /// <summary>A failed background job's mark in the game's record (<see cref="GameRecord.PlanCheckFailed"/>,
     /// <see cref="GameRecord.IndexFailedStamp"/>), so a restart doesn't run it again.</summary>
@@ -3689,12 +3689,12 @@ public sealed partial class ScsKiller : IScsKiller
         + (r.FirstLaunch is { } l ? $", and the first launch still compiled {l.Compiled * 100:0}% of its pipelines" : "")
         + "): the next compile runs without it";
 
-    public const string AgsUntaughtNote = "its first launch teaches SCSKiller its cache key, compile again after it";
+    public const string AgsUntaughtNote = "its first launch teaches Preheat its cache key, compile again after it";
     public const string MissesGameReason = "the compile didn't reach this game's cache: the game uses another driver-cache key";
-    public const string CantReachReason = "the compile can't reach this game: it reads its shaders from a different driver cache than the one SCSKiller fills. Clear its cache to free the space and compile again. A newer driver may also fix it";
+    public const string CantReachReason = "the compile can't reach this game: it reads its shaders from a different driver cache than the one Preheat fills. Clear its cache to free the space and compile again. A newer driver may also fix it";
     public const string ThirtyTwoBitReason = "32-bit games aren't supported yet";
     public const string UnreachedReason = "the compile didn't help this game on NVIDIA, it needs a custom loader";
-    public const string NoShadersReason = "SCSKiller found no shaders it can compile for this game yet", NothingToCompileReason = "there was nothing to compile: " + NoShadersReason;
+    public const string NoShadersReason = "Preheat found no shaders it can compile for this game yet", NothingToCompileReason = "there was nothing to compile: " + NoShadersReason;
     public const string ClearForGameNote ="its compiled cache isn't used, clear it to free the space";
 
     /// <summary>Hits stay under it: a cache hit under a 70-thread precompile took 5 ms at the median (graphics 0.6 ms). A
@@ -3805,7 +3805,7 @@ public sealed partial class ScsKiller : IScsKiller
 
     public const string OverCacheLimitReason = "this game's shaders don't fit the driver's shader cache, raise its size",
         OverGameCapReason = "this game's shaders are more than the driver's shader cache keeps for one game",
-        OverCompileFolderReason = "this game's shaders are more than SCSKiller's compile folder holds for one game",
+        OverCompileFolderReason = "this game's shaders are more than Preheat's compile folder holds for one game",
         CacheFullReason = "the driver's shader cache is full, so it removed older games' files";
 
     /// <summary>Null while compiling again wouldn't keep the files (<see cref="KeptReason"/>).</summary>
@@ -4543,15 +4543,15 @@ public sealed partial class ScsKiller : IScsKiller
         var dxc = keys.Where(k => k.StartsWith(AmdAppCache.D3D12Prefix, StringComparison.Ordinal)).ToList();
         // the AGS app name's key is only a hint: cleared once a process is seen holding it, like any key
         var ags = AgsFor(g, rec) is { } a && AgsKey(g, null) is { } ak && !keys.Contains(ak) && (dxc.Count == 0 || amd.FilesOf([ak]).Count > 0)
-            ? $"SCSKiller finds its D3D12 cache under the AGS app name {a.App} once it compiles the game or sees it running"
+            ? $"Preheat finds its D3D12 cache under the AGS app name {a.App} once it compiles the game or sees it running"
             : null;
         if (dxc.Count > 0 && !names.Any(n => dxc.Contains(AmdAppCache.DxcKey(n)))) return (keys, ags);
         keys.UnionWith(names.Select(AmdAppCache.HintKey).Where(k => amd.FilesOf([k]).Count > 0));
         return (keys, dxc.Count > 0 || ags != null ? ags
-            : "SCSKiller finds all of its driver cache once it compiles the game or sees it running");
+            : "Preheat finds all of its driver cache once it compiles the game or sees it running");
     }
 
-    const string FindsDriverCache = "SCSKiller finds its driver cache once it compiles the game or sees it running";
+    const string FindsDriverCache = "Preheat finds its driver cache once it compiles the game or sees it running";
 
     /// <summary>Which of the game's driver cache <see cref="ClearGameCache"/> may miss (a key not learned yet); null = none.</summary>
     public string? DriverCacheGap(string gameId) => DriverKeys(Find(gameId).Game, Store.LoadGame(gameId)).Gap;
@@ -5114,7 +5114,7 @@ public sealed partial class ScsKiller : IScsKiller
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException)
         {
-            RecorderLog($"{owner.Name}: couldn't clear what SCSKiller kept for it as a game you added (tried again at the next scan): {e.Message}");
+            RecorderLog($"{owner.Name}: couldn't clear what Preheat kept for it as a game you added (tried again at the next scan): {e.Message}");
         }
         return false;
     }
@@ -6615,7 +6615,7 @@ public sealed partial class ScsKiller : IScsKiller
     {
         lock (_lock)
             if (_current is { } c && (c == id || !_planOnly.Contains(c))) return "a compile started";
-        return QueueRunning ? "a compile started" : OtherCompile() ? "another SCSKiller process compiles" : null;
+        return QueueRunning ? "a compile started" : OtherCompile() ? "another Preheat process compiles" : null;
     }
 
     /// <summary>Below-normal threads, as the warm's. The engine readers' Parallel loops run on the caller's scheduler
@@ -6643,7 +6643,7 @@ public sealed partial class ScsKiller : IScsKiller
                     if (lowIo) BackgroundBegin();
                     (ours, Thread.CurrentThread.Priority) = (true, ThreadPriority.BelowNormal);
                     foreach (var t in tasks.GetConsumingEnumerable()) TryExecuteTask(t);
-                }) { IsBackground = true, Name = "SCSKiller background index" }.Start();
+                }) { IsBackground = true, Name = "Preheat background index" }.Start();
         }
 
         public override int MaximumConcurrencyLevel => threads;
@@ -6846,7 +6846,7 @@ public sealed partial class ScsKiller : IScsKiller
         SkipManual = "game folder not confirmed", SkipCrashes = "the recorder crashes this game, so it's off for now",
         SkipShaderInjector = "Shader Injector hooks the same functions as the recorder, so recording stays off while it's installed",
         SkipAgsMod = "a mod's d3d12.dll doesn't load beside the recorder in this game",
-        SkipIntelDriver = "this game loads its own copy of the Intel driver, so SCSKiller doesn't compile or record it";
+        SkipIntelDriver = "this game loads its own copy of the Intel driver, so Preheat doesn't compile or record it";
 
     /// <summary>The <paramref name="skip"/> a page shows: a game short of its key says so, while callers keep seeing it as unsupported.</summary>
     public static string SkipShown(GameState s, string skip) => skip == SkipUnsupported && s.Engine is { Encrypted: true } && NeedsFileKey(s) ? SkipNeedsKey : skip;
@@ -7042,12 +7042,12 @@ public sealed partial class ScsKiller : IScsKiller
     /// <see cref="FlatpakVulkanSkipLine"/>, <see cref="FlatpakManualLine"/>): set where the app starts on Linux, else null.</summary>
     internal static Func<Game, bool, string?>? FlatpakSkip { get; set; }
 
-    public static string FlatpakSkipLine(string launcher) => $"{launcher}'s Flatpak can't see SCSKiller's recorder folder";
-    public static string FlatpakVulkanSkipLine(string launcher) => $"{launcher}'s Flatpak can't save Vulkan recordings in SCSKiller's recorder folder";
+    public static string FlatpakSkipLine(string launcher) => $"{launcher}'s Flatpak can't see Preheat's recorder folder";
+    public static string FlatpakVulkanSkipLine(string launcher) => $"{launcher}'s Flatpak can't save Vulkan recordings in Preheat's recorder folder";
     public static string FlatpakGrantButton(string launcher) => $"Let {launcher} read it";
     public static string FlatpakGrantConfirm(string launcher, bool writes = false) => writes
-        ? $"{launcher}'s games get read-only access to SCSKiller's recorder folder and Vulkan recorder, and may save Vulkan recordings in two folders of it"
-        : $"{launcher}'s games get read-only access to SCSKiller's recorder folder";
+        ? $"{launcher}'s games get read-only access to Preheat's recorder folder and Vulkan recorder, and may save Vulkan recordings in two folders of it"
+        : $"{launcher}'s games get read-only access to Preheat's recorder folder";
     public static string FlatpakGrantDone(string launcher) => $"Restart {launcher} to start recording";
     public static string FlatpakManualLine(string folder, string app, string launcher) => $"Run flatpak override --user --filesystem={folder}:ro {app}, then restart {launcher}";
     public static string FlatpakVulkanManualLine(string folder, string app, string launcher) =>
@@ -7109,7 +7109,7 @@ public sealed partial class ScsKiller : IScsKiller
             using var pe = PeFile.Open(wrapper);
             return PeFile.ImportedFunctions(pe, AgsChainName).Any() ? AgsChainName
                 : PeFile.ImportedFunctions(pe, AgsRealName).Any() ? AgsRealName
-                : throw new IOException($"{wrapper} links no AGS SCSKiller knows");
+                : throw new IOException($"{wrapper} links no AGS Preheat knows");
         }
         catch (Exception e) when (e is BadImageFormatException or InvalidOperationException) { throw new IOException($"{wrapper} can't be read: {e.Message}", e); }
     }
@@ -7234,7 +7234,7 @@ public sealed partial class ScsKiller : IScsKiller
         || name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) && !ProxyNames.Contains(name, StringComparer.OrdinalIgnoreCase) && !RecorderOwnFiles.Contains(name);
 
     // the preloader's FileDescription (proxy/version.rc) as its version resource holds it, in a file of at most 64 KB
-    static readonly byte[] PreloadMarker = System.Text.Encoding.Unicode.GetBytes("SCSKiller recorder preloader");
+    static readonly byte[] PreloadMarker = System.Text.Encoding.Unicode.GetBytes("Preheat recorder preloader");
 
     /// <summary>A preloader of any SCSKiller build, tracked or not (IOException when it can't be read).</summary>
     public static bool IsOurPreload(string path) =>
@@ -7378,12 +7378,12 @@ public sealed partial class ScsKiller : IScsKiller
         {
             var old = Path.Combine(dir, n);
             if (File.Exists(old) && Sha256(old) == rec.RecorderFiles[n] && IsOurPreload(old)) File.Delete(old);
-            else if (File.Exists(old)) RecorderLog($"{g.Name}: left {old}: changed since SCSKiller installed it");
+            else if (File.Exists(old)) RecorderLog($"{g.Name}: left {old}: changed since Preheat installed it");
             DropStored(dir, n, rec.RecorderFiles[n]);
             rec.RecorderFiles.Remove(n);
         }
         if (preload == null) return;
-        if (PreloadTaken(dir, preload, rec)) throw new InvalidOperationException($"{Path.Combine(dir, preload)} already exists and is not SCSKiller's (another mod or the game's own). Not replacing it.");
+        if (PreloadTaken(dir, preload, rec)) throw new InvalidOperationException($"{Path.Combine(dir, preload)} already exists and is not Preheat's (another mod or the game's own). Not replacing it.");
         var src = PreloadSource(preload, g) is { } p && File.Exists(p) ? p : throw new FileNotFoundException($"the recorder's preloader {preload} was not found next to the app");
         var sha = Sha256(src);
         // another build's bytes under another DLL's name: only the hash on the record proves them ours, so they go before it changes
@@ -7521,9 +7521,9 @@ public sealed partial class ScsKiller : IScsKiller
 
     public const string IniPendingNote = "its scskiller.cfg can't be taken out, so the recorder refuses until it's gone";
 
-    public const string UnarmedNote = "left by an earlier install: SCSKiller's recorder refuses it";
+    public const string UnarmedNote = "left by an earlier install: Preheat's recorder refuses it";
 
-    public const string ModRemovedNote = "a mod SCSKiller recorded alongside was removed, so recording is off for this game";
+    public const string ModRemovedNote = "a mod Preheat recorded alongside was removed, so recording is off for this game";
 
     /// <summary>Our proxy in the folder under any of its names (IOException when one can't be read).</summary>
     public static bool OurProxyIn(string dir) => ProxyNames.Any(n => IsOurProxy(Path.Combine(dir, n)));
@@ -8242,7 +8242,7 @@ public sealed partial class ScsKiller : IScsKiller
         }
         // that copy's layer stays registered whatever this one does, so its ini stays that copy's too
         if (VulkanLayer.AppId(g) is { } appId && VulkanLayer.Others(appId, VulkanManifest(appId)).Count > 0)
-            throw new InvalidOperationException("another SCSKiller copy's Vulkan recorder is registered for this game");
+            throw new InvalidOperationException("another Preheat copy's Vulkan recorder is registered for this game");
         if (takeOver)   // before any marker changes: a claim cut off after one still replaces the proxy
         {
             (rec.RecorderClaimed, rec.KeysPending) = (true, true);
@@ -8263,14 +8263,14 @@ public sealed partial class ScsKiller : IScsKiller
             var ini = IniPath(dir);
             if (File.Exists(ini) && File.ReadAllText(ini).StartsWith(RecorderIni, StringComparison.Ordinal))
                 SetIni(Store, dir, e => (e ?? new IniOwner(dir)) with { Tracked = Sha256(ini), Users = false, Remove = false, Install = g.InstallDir });
-            RecorderLog(takeOver ? $"{g.Name}: took over the recorder another SCSKiller copy placed ({dir})"
+            RecorderLog(takeOver ? $"{g.Name}: took over the recorder another Preheat copy placed ({dir})"
                 : $"{g.Name}: marked the recorder this data folder placed before markers as this copy's ({dir})");
         }
         rec.KeysPending = true;   // the keys file was written before the marker: written again
         _recorderNotes.TryRemove(g.Id, out _);
     }
 
-    const string TakeOverFailed = "couldn't take over the recorder another SCSKiller copy placed: ";
+    const string TakeOverFailed = "couldn't take over the recorder another Preheat copy placed: ";
 
     /// <summary>The chain a take-over keeps: one mod renamed by another copy (<see cref="Chained"/>) beside the game's exe, in
     /// the place this copy's recorder goes (<paramref name="target"/> when known), never one in the record's other folder. Null:
@@ -8342,7 +8342,7 @@ public sealed partial class ScsKiller : IScsKiller
 
     static bool TakeOverStuck(string dir) => TakingOver.Any(t => t.Value == 0 && SameDir(t.Key, dir));
 
-    const string TakeOverStuckNote = "its files couldn't all be put back after a failed take-over: left as they are until SCSKiller starts again";
+    const string TakeOverStuckNote = "its files couldn't all be put back after a failed take-over: left as they are until Preheat starts again";
 
     /// <summary>The folders a take-over backs up: each claimed one and its _storage_ (<see cref="RemoveRecorder"/>), not through a link.</summary>
     static List<string> TakeOverDirs(IEnumerable<string> dirs) =>
@@ -8450,7 +8450,7 @@ public sealed partial class ScsKiller : IScsKiller
             // ponytail: no lock across copies, so one taking the folder between this check and the put-back is lost to it
             if (dirs.Where(Foreign).ToList() is { Count: > 0 } taken)
             {
-                RecorderLog($"{g.Name}: the take-over failed: left as it is, another SCSKiller copy took it over meanwhile ({string.Join(", ", taken)})");
+                RecorderLog($"{g.Name}: the take-over failed: left as it is, another Preheat copy took it over meanwhile ({string.Join(", ", taken)})");
                 dirs = [.. dirs.Except(taken)];
                 var left = TakeOverDirs(dirs);
                 files = files.Where(f => left.Contains(Path.GetDirectoryName(f.Key)!, StringComparer.OrdinalIgnoreCase)).ToDictionary(StringComparer.OrdinalIgnoreCase);
@@ -8484,12 +8484,12 @@ public sealed partial class ScsKiller : IScsKiller
             record();
             _rollbacks.TryRemove(g.Id, out _);
             Store.SaveGame(g.Id, rec);
-            RecorderLog($"{g.Name}: the take-over failed: the other SCSKiller copy's recorder put back as it was ({string.Join(", ", dirs)})");
+            RecorderLog($"{g.Name}: the take-over failed: the other Preheat copy's recorder put back as it was ({string.Join(", ", dirs)})");
             return true;
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            RecorderLog($"{g.Name}: the take-over failed and putting the other SCSKiller copy's recorder back failed too ({e.Message}): {TakeOverStuckNote}");
+            RecorderLog($"{g.Name}: the take-over failed and putting the other Preheat copy's recorder back failed too ({e.Message}): {TakeOverStuckNote}");
             return false;
         }
     }
@@ -8597,13 +8597,13 @@ public sealed partial class ScsKiller : IScsKiller
     public static RecorderRemovals RemoveRecordersFromAllGames(AppStore store, Func<IReadOnlySet<string>>? running = null, CancellationToken ct = default) =>
         RemoveAllRecorders(store, running ?? RunningProcessNames, TimeSpan.FromMinutes(2), "removed from all games", ct);
 
-    public const string RemovedFromAllNote = "recorders were removed from all games. Restart SCSKiller to record again";
+    public const string RemovedFromAllNote = "recorders were removed from all games. Restart Preheat to record again";
 
     /// <summary>Install's, InstallVulkan's and an offline session's refusal once
     /// <see cref="RemoveRecordersFromAllGames(CancellationToken)"/> ran: <see cref="RemovedFromAllNote"/>. Removals and Off go on.</summary>
     sealed class RemovedFromAllException() : InvalidOperationException(RemovedFromAllNote);
 
-    public const string ForeignPlaced = "placed by another SCSKiller copy, so it may still record";
+    public const string ForeignPlaced = "placed by another Preheat copy, so it may still record";
     public const string TakeOverNote = "Turn recording on here to take it over";
     public const string ForeignNote = ForeignPlaced + ". " + TakeOverNote;
     public const string ForeignHereNote = "The recorder in its folder was " + ForeignPlaced + ".";
@@ -8628,7 +8628,7 @@ public sealed partial class ScsKiller : IScsKiller
                 rec.RecorderFiles.Clear();
             }
             Store.SaveGame(id, rec);
-            RecorderLog($"{g.Name}: {at} is left to another SCSKiller copy: no recorder of any copy is there");
+            RecorderLog($"{g.Name}: {at} is left to another Preheat copy: no recorder of any copy is there");
         }
         // a recorder without a marker that this data folder's record placed, its files still the bytes it records, that no
         // record of the installed copy names (a 1.2.5 portable's, from before markers): this copy's
@@ -8854,7 +8854,7 @@ public sealed partial class ScsKiller : IScsKiller
                     _recorderSkips.TryRemove(id, out _);
                     KeepFailure(id, rec, null);
                     RecorderLog($"{g.Name}: recorder {(update ? "updated" : want ? "installed" : "removed")} ({dir}){(want && s.Preload is { } pl ? $", preloader {pl}" : "")}");
-                    if (want && OutNeeded(dir)) RecorderLog($"{g.Name}: SCSKiller runs elevated and the game doesn't, so the recorder writes to {OutDir(g.ExePath)}");
+                    if (want && OutNeeded(dir)) RecorderLog($"{g.Name}: Preheat runs elevated and the game doesn't, so the recorder writes to {OutDir(g.ExePath)}");
                     changed = true;
                 }
                 catch (UnauthorizedAccessException e) when (update)   // the old recorder still works: not a skip
@@ -8950,7 +8950,7 @@ public sealed partial class ScsKiller : IScsKiller
         if (e.HResult is unchecked((int)0x800700E1) or unchecked((int)0x800700E2))   // ERROR_VIRUS_INFECTED, ERROR_VIRUS_DELETED
             return "Windows Security or another antivirus removed the recorder file";
         if (e is FileNotFoundException { FileName: var f } && (f == null || !f.StartsWith(Path.TrimEndingDirectorySeparator(dir) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)))
-            return "the recorder file is missing from SCSKiller's folder";
+            return "the recorder file is missing from Preheat's folder";
         if (e is IOException or UnauthorizedAccessException && e.HResult >>> 16 == 0x8007)   // FACILITY_WIN32
             return (e.HResult & 0xFFFF) switch
             {
@@ -9058,7 +9058,7 @@ public sealed partial class ScsKiller : IScsKiller
     internal static bool RecorderInstallAllowed(string dataDir, string? moved, string? testFlag) =>
         moved == null || !Path.GetFullPath(dataDir).Equals(moved, StringComparison.OrdinalIgnoreCase) || testFlag == "1";
 
-    const string MovedDataRefusal = "the data folder is moved (SCSKILLER_DATA_DIR), which SCSKiller's uninstall doesn't know: set SCSKILLER_TEST_RECORDER=1 to install a recorder anyway, and take it out yourself";
+    const string MovedDataRefusal = "the data folder is moved (SCSKILLER_DATA_DIR), which Preheat's uninstall doesn't know: set SCSKILLER_TEST_RECORDER=1 to install a recorder anyway, and take it out yourself";
 
     /// <param name="name">the recorder's file name in the game (<see cref="RecorderDll"/>)</param>
     /// <param name="preload">the preloader's name (<see cref="GameState.Preload"/>); null: none, and one placed before goes</param>
@@ -9086,8 +9086,8 @@ public sealed partial class ScsKiller : IScsKiller
         if (name == AgsName && AgsModSkip(g.ExePath) is { } agsMod) throw new InvalidOperationException($"{Path.Combine(dir, Dll12)}: {agsMod}. Not installing.");   // a mod put back by a rename's removal
         if (name == AgsName && GameFiles.AgsUnfit(chain ? dll : agsChained, g.ExePath, src) is { } agsUnfit)
             throw new InvalidOperationException($"{dll}: the game's AGS ({agsUnfit}) isn't one the recorder can wrap. Not installing.");
-        if (!iniOurs && FramesOnly(name, Vendor.Caps, Games.FirstOrDefault(x => x.Game.Id == g.Id)?.Engine)) throw new InvalidOperationException($"{ini} is not SCSKiller's: the frame times recorder needs its own. Not installing.");
-        if (preload != null && PreloadTaken(dir, preload, rec)) throw new InvalidOperationException($"{Path.Combine(dir, preload)} already exists and is not SCSKiller's (another mod or the game's own). Not installing.");
+        if (!iniOurs && FramesOnly(name, Vendor.Caps, Games.FirstOrDefault(x => x.Game.Id == g.Id)?.Engine)) throw new InvalidOperationException($"{ini} is not Preheat's: the frame times recorder needs its own. Not installing.");
+        if (preload != null && PreloadTaken(dir, preload, rec)) throw new InvalidOperationException($"{Path.Combine(dir, preload)} already exists and is not Preheat's (another mod or the game's own). Not installing.");
         if (preload != null && !File.Exists(PreloadSource(preload, g))) throw new FileNotFoundException($"the recorder's preloader {preload} was not found next to the app");
         (rec.RecorderExe, rec.RecorderInstallDir) = (g.ExePath, g.InstallDir);
         StampLedger(dir);   // first: a recorder cut off halfway in is still this copy's
@@ -9099,9 +9099,9 @@ public sealed partial class ScsKiller : IScsKiller
         {
             // the game's own AGS, only a build the wrapper fits (its version and exports): anything else, a mod's too, stays
             if (name == AgsName ? GameFiles.AgsUnfit(dll, g.ExePath, src) != null : !rec.RecordAlongsideMod)
-                throw new InvalidOperationException($"{dll} already exists and is not SCSKiller's (another mod or wrapper). Not replacing it.");
+                throw new InvalidOperationException($"{dll} already exists and is not Preheat's (another mod or wrapper). Not replacing it.");
             if (name != AgsName && ChainBlocker(dll) is { } why) throw new InvalidOperationException($"{dll}: {why}. Not renaming it.");
-            if (!iniOurs) throw new InvalidOperationException($"{ini} is not SCSKiller's: the chain to {dll} needs its own. Not renaming it.");
+            if (!iniOurs) throw new InvalidOperationException($"{ini} is not Preheat's: the chain to {dll} needs its own. Not renaming it.");
             var to = Path.Combine(dir, ChainOf(name));
             if (File.Exists(to)) throw new InvalidOperationException($"{to} already exists. Not renaming {dll} over it.");
             rec.RecorderChained = new ChainedDll(ChainOf(name), Sha256(dll));
@@ -9426,7 +9426,7 @@ public sealed partial class ScsKiller : IScsKiller
         foreach (var f in folders.Where(f => Directory.Exists(f.Dir) && Foreign(f.Dir)).ToList())
         {
             folders.Remove(f);
-            RecorderLog($"{g.Name}: recorder left in {f.Dir}: another SCSKiller copy's");
+            RecorderLog($"{g.Name}: recorder left in {f.Dir}: another Preheat copy's");
         }
         var dirs = folders.Select(f => f.Dir).ToList();
         bool done;
@@ -9530,13 +9530,13 @@ public sealed partial class ScsKiller : IScsKiller
     void ForeignTakeOut(string dir, Game g, string why)
     {
         var (ini, ledger) = (IniPath(dir), Path.Combine(dir, LedgerStamp));
-        var owner = "another SCSKiller copy";
+        var owner = "another Preheat copy";
         try
         {
             string? named = null;
-            if (!Directory.EnumerateFileSystemEntries(dir, LedgerStamp).Any()) owner = "the installed SCSKiller copy";
+            if (!Directory.EnumerateFileSystemEntries(dir, LedgerStamp).Any()) owner = "the installed Preheat copy";
             else
-                try { owner = $"the SCSKiller copy of {named = File.ReadAllText(ledger).Trim()}"; }
+                try { owner = $"the Preheat copy of {named = File.ReadAllText(ledger).Trim()}"; }
                 catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }   // it stays, the recorder still goes
             var held = new List<string>();
             void TakeOut()
@@ -9565,7 +9565,7 @@ public sealed partial class ScsKiller : IScsKiller
                     }
                     catch (Exception e) when (e is IOException or UnauthorizedAccessException) { held.Add(Path.GetFileName(chain)); }
                     // parked, inert under that name, until the mod is back: a crash meanwhile never reads as the mod's uninstall (Orphaned)
-                    if (File.Exists(p + TempSuffix) && !IsOurProxy(p + TempSuffix)) throw new IOException($"{p + TempSuffix} isn't SCSKiller's: {p} stays until it's gone");
+                    if (File.Exists(p + TempSuffix) && !IsOurProxy(p + TempSuffix)) throw new IOException($"{p + TempSuffix} isn't Preheat's: {p} stays until it's gone");
                     File.Move(p, p + TempSuffix, overwrite: true);
                 }
                 // a mod a pass couldn't rename back while it was held: its name is free now
@@ -9866,9 +9866,9 @@ public sealed partial class ScsKiller : IScsKiller
     static readonly string[] IniComments =
     [
         "; the recording limit per game (Settings): no new records once scskiller.db has this many bytes",
-        "; the game's own d3d12.dll (a mod), renamed by SCSKiller and put back when the recorder is removed",
+        "; the game's own d3d12.dll (a mod), renamed by Preheat and put back when the recorder is removed",
         "; the game's install folder: the recorder checks its entries for anti-cheat too",
-        "; the game's exe when SCSKiller last found no anti-cheat in its folders: the recorder records only while it is unchanged",
+        "; the game's exe when Preheat last found no anti-cheat in its folders: the recorder records only while it is unchanged",
         "; frame times for a before and after recording, nothing else is recorded",
     ];
 
@@ -10193,7 +10193,7 @@ public sealed partial class ScsKiller : IScsKiller
             return e with { Tracked = Convert.ToHexString(SHA256.HashData(judged)), Users = false, Remove = false, Chain = chain, Install = g.InstallDir };
         });
         if (!adopted) return (state, judged);
-        RecorderLog($"{g.Name}: the scskiller.cfg in {dir} is SCSKiller's own, signed for this game: tracked again");
+        RecorderLog($"{g.Name}: the scskiller.cfg in {dir} is Preheat's own, signed for this game: tracked again");
         return (IniState.Ours, judged);
     }
 
@@ -10282,7 +10282,7 @@ public sealed partial class ScsKiller : IScsKiller
             if (!armDropped)
             {
                 rec.RecorderRollback = true;
-                log($"{name}: SCSKiller's arm for {dir} couldn't be taken out: tried again later");
+                log($"{name}: Preheat's arm for {dir} couldn't be taken out: tried again later");
                 return false;
             }
             if (!Gone(dir))
@@ -10332,12 +10332,12 @@ public sealed partial class ScsKiller : IScsKiller
                 if (rec.RecorderChained is { } chained && RoleOf(chained) == n)
                 {
                     if (File.Exists(proxy + TempSuffix) && !IsOurProxy(proxy + TempSuffix))   // the removal stays pending: the ini went, so the proxy is a pass-through
-                        throw new IOException($"{proxy + TempSuffix} isn't SCSKiller's: {proxy} stays until it's gone");
+                        throw new IOException($"{proxy + TempSuffix} isn't Preheat's: {proxy} stays until it's gone");
                     File.Move(proxy, proxy + TempSuffix, overwrite: true);
                 }
                 else File.Delete(proxy);
             }
-            else if (File.Exists(proxy) && rec.RecorderFiles.ContainsKey(n)) log($"{name}: left {proxy}: not SCSKiller's");
+            else if (File.Exists(proxy) && rec.RecorderFiles.ContainsKey(n)) log($"{name}: left {proxy}: not Preheat's");
             rec.RecorderFiles.Remove(n);
             var copy = Path.Combine(storage, n);
             if (storageOurs && IsOurProxy(copy)) File.Delete(copy);   // a failure throws as the proxy's does: the removal is tried again
@@ -10366,11 +10366,11 @@ public sealed partial class ScsKiller : IScsKiller
                 rec.Recorder = RecorderOverride.Off;
                 log($"{name}: {dll} was deleted while the recorder ran alongside a mod (its uninstall?): {from} left unused, recording turned off");
             }
-            else if (!File.Exists(from)) log($"{name}: {from} (the mod's {Path.GetFileName(dll)} SCSKiller renamed) is gone");
+            else if (!File.Exists(from)) log($"{name}: {from} (the mod's {Path.GetFileName(dll)} Preheat renamed) is gone");
             else if (File.Exists(dll)) log($"{name}: left {from}: another {Path.GetFileName(dll)} is in its place");
             else
             {
-                if (c.Sha256 != "" && Sha256(from) != c.Sha256) log($"{name}: {from} changed since SCSKiller renamed it (the mod updated itself?): put back as it is");
+                if (c.Sha256 != "" && Sha256(from) != c.Sha256) log($"{name}: {from} changed since Preheat renamed it (the mod updated itself?): put back as it is");
                 File.Move(from, dll);
             }
             rec.RecorderChained = null;
@@ -10378,7 +10378,7 @@ public sealed partial class ScsKiller : IScsKiller
             {
                 // ours goes with the hash-matched files below: one that can't be deleted stays on the record
                 if (IsOurProxy(dll + TempSuffix)) rec.RecorderFiles[Path.GetFileName(dll + TempSuffix)] = Sha256(dll + TempSuffix);
-                else if (File.Exists(dll + TempSuffix)) log($"{name}: left {dll + TempSuffix}: not SCSKiller's");
+                else if (File.Exists(dll + TempSuffix)) log($"{name}: left {dll + TempSuffix}: not Preheat's");
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException) { log($"{name}: left {dll + TempSuffix}: {e.Message}"); }
         }
@@ -10388,7 +10388,7 @@ public sealed partial class ScsKiller : IScsKiller
             try
             {
                 if (File.Exists(path) && Sha256(path) == hash) File.Delete(path);
-                else if (File.Exists(path)) log($"{name}: left {path}: changed since SCSKiller installed it");
+                else if (File.Exists(path)) log($"{name}: left {path}: changed since Preheat installed it");
             }
             catch (Exception e)
             {
@@ -10470,7 +10470,7 @@ public sealed partial class ScsKiller : IScsKiller
                 bool Runs() => running() is var names && (Running(exe, installDir, names) || moveTo != null && Running(moveTo, installDir, names)
                                                           || tree == null || tree.Overlaps(names));
                 if (Late()) Leave(why, Over(), $"{Over()}: recorder left in {dir}");
-                else if (Foreign(dir)) Leave(why, RemovalForeign, $"recorder left in {dir}: another SCSKiller copy's");
+                else if (Foreign(dir)) Leave(why, RemovalForeign, $"recorder left in {dir}: another Preheat copy's");
                 else if (tree == null) Leave(why, "its install folder couldn't be read in time", $"{installDir} not read whole in time: recorder left in {dir}");
                 else if (Runs()) Leave(why, "the game is running", $"{exe} is running: recorder left in {dir}");
                 else
@@ -10483,7 +10483,7 @@ public sealed partial class ScsKiller : IScsKiller
                                  .Distinct(StringComparer.OrdinalIgnoreCase).ToList())
                         try
                         {
-                            if (Foreign(d)) { Leave(why, RemovalForeign, $"recorder left in {d}: another SCSKiller copy's"); continue; }   // a move's other end taken over since
+                            if (Foreign(d)) { Leave(why, RemovalForeign, $"recorder left in {d}: another Preheat copy's"); continue; }   // a move's other end taken over since
                             if (RemoveRecorder(d, rec, store, d, Log, installDir, Left()) && d.Equals(dir, StringComparison.OrdinalIgnoreCase)) removed.Add((id, d, Runs));
                             if (rec.VulkanLayer != null) Leave(why, RemovalVulkan, null);   // its unregistration failed: RemoveRecorder logged it
                             if (Directory.Exists(d))
@@ -10545,7 +10545,7 @@ public sealed partial class ScsKiller : IScsKiller
     }
 
     // what RemoveAllRecorders says is left in a game's folder
-    internal const string RemovalForeign = "another SCSKiller copy placed it", RemovalHeld = "some of its files can't be taken out yet",
+    internal const string RemovalForeign = "another Preheat copy placed it", RemovalHeld = "some of its files can't be taken out yet",
         RemovalVulkan = "its Vulkan recorder's registration can't be taken out yet";
 
     // a store's uninstall is final; an update, a repair or a drive coming back doesn't look like one twice this far apart
@@ -10601,7 +10601,7 @@ public sealed partial class ScsKiller : IScsKiller
                     if (age < GoneFor) continue;
                     if (Foreign(dir))
                     {
-                        RecorderLog($"{id}: recorder left in {dir}: another SCSKiller copy's");
+                        RecorderLog($"{id}: recorder left in {dir}: another Preheat copy's");
                         continue;
                     }
                     if (Links(installDir, dir) is { } link)
@@ -11452,7 +11452,7 @@ public sealed partial class ScsKiller : IScsKiller
     }
 
     /// <summary>A waiting item's <see cref="QueueItem.Note"/> while another process compiles the game.</summary>
-    public const string AnotherCompileNote = "waits for another SCSKiller compile of this game";
+    public const string AnotherCompileNote = "waits for another Preheat compile of this game";
 
     /// <summary>games\&lt;id&gt;\compile.lock, open with no sharing for the whole item; null while another process has it.
     /// A handle, not <see cref="AppStore.PathGate"/>: it is released on another thread after the item's awaits.</summary>
@@ -11625,7 +11625,7 @@ public sealed partial class ScsKiller : IScsKiller
                 if (r.Skipped > 0) line += $", {r.Skipped:N0} skipped ({SkippedWhy(warmPlan)})";
                 if (crashed - crashedBefore is > 0 and var n) line += n == 1 ? ", 1 skipped (it crashes the GPU driver)" : $", {n:N0} skipped (they crash the GPU driver)";
                 if (r.DriverSkipped - r.Known is > 0 and var now) line += $", {now:N0} skipped for this compile (the GPU driver crashed, hung or ran out of memory on {(now == 1 ? "it or on what it builds on, or it wasn't" : "them or on what they build on, or they weren't")} tried past a spot where it kept failing)";
-                if (unbuilt + amdLeftOut > 0) line += $", {unbuilt + amdLeftOut:N0} skipped (SCSKiller can't build them yet)";
+                if (unbuilt + amdLeftOut > 0) line += $", {unbuilt + amdLeftOut:N0} skipped (Preheat can't build them yet)";
                 if (r.Invalid > 0) line += $", {r.Invalid:N0} skipped ({InvalidWhy(r.Invalid)})";
                 if (r.Unsupported > 0) line += $", {r.Unsupported:N0} skipped ({UnsupportedWhy(r.Unsupported)})";
                 if (r.Known + crashedBefore > 0) line += ", " + KnownNote(r.Known + crashedBefore);
@@ -13154,7 +13154,7 @@ public sealed partial class ScsKiller : IScsKiller
         foreach (var d in doubt) Log?.Report($"{g.Name}: {d} couldn't be read, tried again at the next start or game exit");
         if (made.Count > 0 && NoteLinked(g) is { } linkWhy)
         {
-            Log?.Report($"{g.Name}: its D3DSCache folder {linkWhy}, which SCSKiller doesn't merge into: the compile's dbs stay in {string.Join(", ", made.Select(Path.GetFileName))}");
+            Log?.Report($"{g.Name}: its D3DSCache folder {linkWhy}, which Preheat doesn't merge into: the compile's dbs stay in {string.Join(", ", made.Select(Path.GetFileName))}");
             return false;
         }
         if (made.Count > 0 && D3DSCache.Delivered(g.ExePath) is { } asd)
@@ -13310,7 +13310,7 @@ public sealed partial class ScsKiller : IScsKiller
 
     bool Clearing(string id) { lock (_clearing) return _clearing.ContainsKey(id); }
 
-    public const string FoldingNote = "SCSKiller is handing the last compile to the game's cache";
+    public const string FoldingNote = "Preheat is handing the last compile to the game's cache";
 
     /// <summary>A fold the queue doesn't show, with the game's name: the Library's and the tray's line; null = none.</summary>
     public string? FoldingLine => _folds.Keys.FirstOrDefault(f => !f.Queued && f.Percent >= 0) is { } f ? FoldText(f.Name + "'s", f.Percent, f.Writing, f.Clock.Elapsed) : null;
@@ -13610,8 +13610,8 @@ public sealed partial class ScsKiller : IScsKiller
         if (GameD3DSCache(g) == null && OperatingSystem.IsWindows() && LaunchExe(g) is { } exe
             && Path.Combine(LocalAppData, "D3DSCache", D3DSCache.FolderName(exe)) is var dir && IsLink(dir))
             why = D3DSCache.Followed(dir, out var refused) is not { } real ? refused
-                : InDataDir(real) ? "links into SCSKiller's data folder"
-                : D3DSCache.IsGames(dir, g) == false ? "links to another game's cache" : "links to a folder SCSKiller can't tell is the game's";
+                : InDataDir(real) ? "links into Preheat's data folder"
+                : D3DSCache.IsGames(dir, g) == false ? "links to another game's cache" : "links to a folder Preheat can't tell is the game's";
         if (Store.LoadGame(g.Id).D3DSCacheLinked != why)
             AppStore.Locked(Path.Combine(Store.GameDir(g.Id), "state.json"), () =>
             {
@@ -13653,7 +13653,7 @@ public sealed partial class ScsKiller : IScsKiller
 
     /// <summary>The game page's and the command line's line under the status, when a delivered db fits this driver; null = none.</summary>
     public static string? DeliveryLine(GameState s) => s is { DeliveredShaders: not null, DeliveryFits: true }
-        ? "Windows already delivered part of this game's compiled shaders. SCSKiller compiles the rest." : null;
+        ? "Windows already delivered part of this game's compiled shaders. Preheat compiles the rest." : null;
 
     /// <summary>The game page's and the command line's line under a cache-gone status whose D3DSCache dbs Windows' automatic
     /// cleanup may have emptied (<see cref="GameState.D3DSCacheCleanup"/>); null = none.</summary>
@@ -13924,15 +13924,15 @@ public sealed partial class ScsKiller : IScsKiller
             {
                 0 => $"the driver refused the root signature of all {failed:N0} pipelines",
                 1 => $"the driver rejected all {failed:N0} pipelines",
-                3 => $"SCSKiller can't build any of the {failed:N0} pipelines yet",
-                _ => $"SCSKiller couldn't read any of the {failed:N0} pipelines",
+                3 => $"Preheat can't build any of the {failed:N0} pipelines yet",
+                _ => $"Preheat couldn't read any of the {failed:N0} pipelines",
             }
             : all + top switch
             {
                 0 => ", most because the driver refused their root signature",
                 1 => ", most rejected by the driver",
-                3 => ", most because SCSKiller can't build them yet",
-                _ => ", most because SCSKiller couldn't read them",
+                3 => ", most because Preheat can't build them yet",
+                _ => ", most because Preheat couldn't read them",
             };
     }
 
@@ -14173,7 +14173,7 @@ public sealed partial class ScsKiller : IScsKiller
         catch (Exception e) when (e is IOException or UnauthorizedAccessException) { Log?.Report($"{StoppedFile} not removed: {e.Message}"); }
     }
 
-    string? FullReplayReason(Game g, GameRecord r, EngineInfo? e, GpuSnapshot snap, bool compiling = false) => ColdWarm(r, snap.Id) ? (r is { WarmedDriverId: LostD3DSCache, D3DSCacheDamaged: false } ? "once, because SCSKiller 1.3.0 removed this driver's cache after its compiles" : NothingOnRecord)
+    string? FullReplayReason(Game g, GameRecord r, EngineInfo? e, GpuSnapshot snap, bool compiling = false) => ColdWarm(r, snap.Id) ? (r is { WarmedDriverId: LostD3DSCache, D3DSCacheDamaged: false } ? "once, because Preheat 1.3.0 removed this driver's cache after its compiles" : NothingOnRecord)
         : WarmChanged(g, r, e, snap) ?? ReplayAgain(r) ?? DeliveryChanged(g, r) ?? CacheFilesChanged(g.Id, r, compiling: compiling);
 
     /// <summary>The last complete warm left out what the game's Advanced Shader Delivery served, and that delivery is gone or another.</summary>
@@ -15133,7 +15133,7 @@ public sealed partial class ScsKiller : IScsKiller
 
     /// <summary>The installed copy's <see cref="LedgerDir"/> (data folder %LOCALAPPDATA%\SCSKiller): a recorder without a
     /// <see cref="LedgerStamp"/> is its. Replaceable for tests.</summary>
-    internal static string DefaultLedger { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SCSKiller", "armed");
+    internal static string DefaultLedger { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Preheat", "armed");
 
     /// <summary>Beside a recorder placed by a copy that isn't the installed one (a portable or test copy): that copy's
     /// <see cref="LedgerDir"/> (UTF-8, one line). It goes last, with the recorder's data files.</summary>
@@ -15207,7 +15207,7 @@ public sealed partial class ScsKiller : IScsKiller
         Wrote(path, Convert.ToHexString(SHA256.HashData(bytes)));
     }
 
-    sealed class ForeignFolderException(string dir) : IOException($"the recorder in {dir} is another SCSKiller copy's: left as it is");
+    sealed class ForeignFolderException(string dir) : IOException($"the recorder in {dir} is another Preheat copy's: left as it is");
 
     /// <summary>A folder inside a game folder with a marker of another copy's (or one that can't be read).</summary>
     static bool MarkedElsewhere(string dir)
@@ -15390,7 +15390,7 @@ public sealed partial class ScsKiller : IScsKiller
         bool owned;
         try { owned = mutex.WaitOne(TimeSpan.FromSeconds(10)); }
         catch (AbandonedMutexException) { owned = true; }
-        if (!owned) throw new IOException("another SCSKiller process holds it");
+        if (!owned) throw new IOException("another Preheat process holds it");
         try { change(); }
         finally { mutex.ReleaseMutex(); }
     }
@@ -15684,7 +15684,7 @@ public sealed partial class ScsKiller : IScsKiller
             && !Games.Any(s => s.Game.Id != g.Id && s.Game.ExePath.Equals(old, StringComparison.OrdinalIgnoreCase)) ? old : null;
         var dir = Path.GetDirectoryName(g.ExePath)!;
         // an unelevated run signs without out=1: the elevated install's stamp stands while it is valid
-        if (CfgLocked(dir)) return Attested(g) || Unstamped("the game changed, and its scskiller.cfg waits for SCSKiller to run elevated");
+        if (CfgLocked(dir)) return Attested(g) || Unstamped("the game changed, and its scskiller.cfg waits for Preheat to run elevated");
         foreach (var armed in Directory.Exists(dir) ? Directory.EnumerateFiles(dir, ArmedFile + "*") : [])
             try { File.Delete(armed); }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException) { RecorderLog($"{g.Name}: couldn't delete {armed}: {e.Message}"); }
@@ -15694,7 +15694,7 @@ public sealed partial class ScsKiller : IScsKiller
         {
             unsigned = stamp == null ? $"{Path.GetFileName(g.ExePath)} couldn't be read when its check began"
                 : Unconfirmed(g) || g.Store == Core.Store.Manual && Manual?.ConfirmedNow(g) != true ? SkipManual
-                : !OurProxyIn(dir) && !VulkanIn(g, rec) ? $"SCSKiller's proxy isn't in {dir}"
+                : !OurProxyIn(dir) && !VulkanIn(g, rec) ? $"Preheat's proxy isn't in {dir}"
                 : BlockingMod(g) != null ? SkipShaderMod : null;
             if (unsigned == null) signed = Signed(g, stamp!, SignedLines(g, rec));
         }
@@ -15710,14 +15710,14 @@ public sealed partial class ScsKiller : IScsKiller
         }
         if (signed == null) return Unstamped(unsigned ?? "its stamp couldn't be signed");
         if (IniStamp(g.ExePath) != signed)
-            return Unstamped($"its scskiller.cfg in {dir} couldn't be written (one that isn't SCSKiller's is left as it is)");
+            return Unstamped($"its scskiller.cfg in {dir} couldn't be written (one that isn't Preheat's is left as it is)");
         IniState owner;
         try { owner = JudgeIni(dir, Store, rec.RecorderChained?.Name, g.InstallDir).State; }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException) { owner = IniState.Unknown; RecorderLog($"{g.Name}: whose the scskiller.cfg in {dir} is couldn't be recorded: {e.Message}"); }
         if (owner != IniState.Ours)   // ours by its stamp, not by ownership (another encoding of it): refused while it's there
         {
             Revoke(dir, true, RecorderLog);
-            return Unstamped($"the scskiller.cfg in {dir} isn't SCSKiller's (left as it is)");
+            return Unstamped($"the scskiller.cfg in {dir} isn't Preheat's (left as it is)");
         }
         _unstamped.TryRemove(g.Id, out _);
         Revoke(dir, false, RecorderLog, still: () => RemovalGen(g.Id) == gen);
@@ -15749,7 +15749,7 @@ public sealed partial class ScsKiller : IScsKiller
         return state == IniState.NotOurs ? NoteForeignIni : null;
     }
 
-    internal const string NoteForeignIni = "records nothing: the scskiller.cfg in its folder isn't SCSKiller's, so it's left as it is";
+    internal const string NoteForeignIni = "records nothing: the scskiller.cfg in its folder isn't Preheat's, so it's left as it is";
 
     readonly ConcurrentDictionary<string, string> _unstamped = new();   // game id -> why it was last logged unstamped
     readonly ConcurrentDictionary<string, byte> _cfgLocked = new(StringComparer.OrdinalIgnoreCase);   // folders CfgLockedNote noted
@@ -15769,7 +15769,7 @@ public sealed partial class ScsKiller : IScsKiller
     /// <summary>Once per folder, in recorders.log only: nothing for the user to do until SCSKiller runs elevated.</summary>
     void CfgLockedNote(string dir)
     {
-        if (_cfgLocked.TryAdd(FullDir(dir), 0)) RecordersLog(Store.DataDir, $"{dir}: the recorder's scskiller.cfg is left as it is until SCSKiller runs elevated");
+        if (_cfgLocked.TryAdd(FullDir(dir), 0)) RecordersLog(Store.DataDir, $"{dir}: the recorder's scskiller.cfg is left as it is until Preheat runs elevated");
     }
 
     /// <summary>Why the proxy passed the exe's last launch through, from the file it leaves in the recorder folder's refused\
@@ -15896,7 +15896,7 @@ public sealed partial class ScsKiller : IScsKiller
                     SetIni(store, dir, e => e is { Remove: true } ? e with { Remove = false, Tracked = null } : e, wait);
                     // a stamp in it (an edit of SCSKiller's, in any encoding the proxy's reader takes) may still be valid: refused while it's there
                     kept = true;
-                    log($"{name}: {ini} isn't what SCSKiller wrote, so it's kept as the user's and the recorder there is refused");
+                    log($"{name}: {ini} isn't what Preheat wrote, so it's kept as the user's and the recorder there is refused");
                     continue;
             }
             SetIni(store, dir, e => Pending(e, Convert.ToHexString(SHA256.HashData(judged!))), wait);   // tracked until it is out
@@ -15959,7 +15959,7 @@ public sealed partial class ScsKiller : IScsKiller
                 bool owned;
                 try { owned = mutex.WaitOne(TimeSpan.FromSeconds(10)); }
                 catch (AbandonedMutexException) { owned = true; }
-                if (!owned) throw new IOException("another SCSKiller process holds it");
+                if (!owned) throw new IOException("another Preheat process holds it");
                 try
                 {
                     if (on) DropStamps(entries[1]);   // the list holds it off anyway

@@ -128,7 +128,7 @@ sealed class FolderInstance : IDisposable
         pwrite(_lock, text, text.Length, 0);
         ftruncate(_lock, text.Length);
         if (_listen < 0) return;
-        _serve = new Thread(Serve) { IsBackground = true, Name = "SCSKiller instance" };
+        _serve = new Thread(Serve) { IsBackground = true, Name = "Preheat instance" };
         _serve.Start();
     }
 

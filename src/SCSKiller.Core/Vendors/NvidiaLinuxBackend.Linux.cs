@@ -37,5 +37,5 @@ public sealed class NvidiaLinuxBackend(GpuInfo adapter, string? gamesDir = null,
     public CacheLimit? GetCacheLimit() => new(NvidiaLinux.PlacedCacheSize, IsDriverDefault: false, Ours: true);
 
     public void SetCacheLimit(CacheLimit limit) =>
-        throw new NotSupportedException($"on Linux SCSKiller gives each game {Format.Bytes(NvidiaLinux.PlacedCacheSize)} of NVIDIA shader cache ({Gpu.Name})");
+        throw new NotSupportedException($"on Linux Preheat gives each game {Format.Bytes(NvidiaLinux.PlacedCacheSize)} of NVIDIA shader cache ({Gpu.Name})");
 }

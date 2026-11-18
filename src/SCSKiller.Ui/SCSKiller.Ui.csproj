@@ -14,7 +14,7 @@
   <!-- toasts and single instance: the Windows App SDK's Foundation component, self-contained, without WinUI -->
   <PropertyGroup Condition="'$([MSBuild]::GetTargetPlatformIdentifier($(TargetFramework)))' == 'windows'">
     <!-- SCSKiller.exe: Velopack's mainExe and shortcut, the toast and single-instance registrations, the Run value and the scheduled task all name it -->
-    <AssemblyName>SCSKiller</AssemblyName>
+    <AssemblyName>Preheat</AssemblyName>
     <ApplicationIcon>..\SCSKiller.App\Assets\app.ico</ApplicationIcon>
     <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>

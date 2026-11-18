@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text.Json;
@@ -9,17 +9,18 @@ using SCSKiller.Core.Unreal;
 using SCSKiller.Core.Vendors;
 
 const string Usage = """
-    usage: scskiller <command>
+    usage: preheat <command>
       scan [--rescan]                             discover games and show their status (--rescan: redo engine detection)
       add <exe> [<install folder>]                add a game no store lists, by its exe (with its folder: the recorder may go there)
-      exe <game> <exe>|auto                       a store game's exe: one of its install, or auto for the one SCSKiller picks
+      exe <game> <exe>|auto                       a store game's exe: one of its install, or auto for the one Preheat picks
       status [game]                               all games, or one in detail
-      compile <game|--all-ready> [--threads N] [--idle | --when-idle] [--careful | --fast] [--rt-only]
+      compile <game|--all-ready> [--threads N] [--idle | --when-idle] [--careful | --fast] [--rt-only] [--stop-file F]
                                                   --idle: background priority. --when-idle: also only while nobody uses the PC.
                                                   --careful (AMD): this and later compiles of the game compile its recorded
                                                   pipelines in passes on few threads, so the driver keeps more of them (slower).
                                                   --fast: back to one pass. --rt-only: only the ray tracing pipelines,
-                                                  the rest at the game's next compile
+                                                  the rest at the game's next compile. --stop-file F (Preheat): stop as
+                                                  Ctrl+C does once F exists, for callers without a console
       queue [command]                             debug shell for the compile queue: the command, then one per line on stdin:
                                                   list | add <game> | move <game> <index> | remove <game> | start | stop | wait | quit
       before-after <game> [--minutes N] [--no-overlay] [--max]  debug: a before and after recording without the app (you start the game)
@@ -37,8 +38,8 @@ const string Usage = """
         (cache set / nvidia-auto-shader, as the app runs them elevated: --yes skips the question, --result <file>
          writes the outcome as a JSON line, --for-user <SID> refuses a different account's elevation)
       record install|uninstall <game>
-      record remove-all                           take the recorder out of every game, as SCSKiller's uninstall does
-      record clear <game>                         delete the game's recording (the recorder's data files and SCSKiller's copy, asks first)
+      record remove-all                           take the recorder out of every game, as Preheat's uninstall does
+      record clear <game>                         delete the game's recording (the recorder's data files and Preheat's copy, asks first)
       record alongside <game> on|off              let the recorder chain to a mod's d3d12.dll (renamed, put back on removal)
       record grant <game>                         Linux: let the game's Flatpak launcher read the recorder folder (asks first)
       shared <game> on|off|follow                 use the shared shader hashes for the game: off, nothing is downloaded for it and its plans leave them out, follow = Settings
@@ -58,7 +59,7 @@ const string Usage = """
     """;
 
 Console.OutputEncoding = System.Text.Encoding.UTF8;  // game names carry ™ and ®
-RouteFailover.Product = "SCSKiller-CLI";
+RouteFailover.Product = "Preheat-CLI";
 if (args.Length == 0 || args[0] is "-h" or "--help" or CliCommands.Help) { Console.WriteLine(Usage); return 0; }
 // before anything reads the data folder: a portable copy's first read copies the installed one's
 if (args[0] is "-v" or "--version" or CliCommands.Version) { if (Stray(1, "--version") is { } stray) return stray; Console.WriteLine(AppVersion.Current); return 0; }
@@ -109,7 +110,7 @@ try
         CliCommands.SteamPlace => await SteamPlace(),
         CliCommands.NvidiaSnapshot => Stray(1, "nvidia-snapshot") ?? NvidiaSnapshot(),
         CliCommands.NvidiaAutoShader => Stray(2, "nvidia-auto-shader off|low|medium|high") ?? NvidiaAutoShader(),
-        CliCommands.FetchCodecs => FetchCodecs(args.ElementAtOrDefault(1) ?? throw new ArgumentException("usage: scskiller fetch-codecs <dir>")),
+        CliCommands.FetchCodecs => FetchCodecs(args.ElementAtOrDefault(1) ?? throw new ArgumentException("usage: preheat fetch-codecs <dir>")),
         _ => Fail($"unknown command '{args[0]}'\n{Usage}"),
     };
 }
@@ -204,7 +205,7 @@ IGpuVendorBackend RunningGpu()
     return long.TryParse(hex, System.Globalization.NumberStyles.HexNumber, null, out var luid)
         && GpuBackends.Adapters().FirstOrDefault(a => a.Gpu.AdapterLuid == luid) is { } running
         ? ScsKiller.DetectGpu(GpuBackends.ChoiceOf(running))
-        : throw new InvalidOperationException("the GPU SCSKiller runs on isn't listed any more (a driver reload): restart SCSKiller and try again");
+        : throw new InvalidOperationException("the GPU Preheat runs on isn't listed any more (a driver reload): restart Preheat and try again");
 }
 
 string? Opt(string name)
@@ -220,7 +221,7 @@ int? Stray(int words, string usage)
 {
     string[] valued = [Elevated.ResultArg, Elevated.ForUserArg, ScsKiller.AdapterArg];
     if (args.Where((a, i) => i == 0 || !a.StartsWith("--") && !valued.Contains(args[i - 1])).Skip(words).FirstOrDefault() is not { } stray) return null;
-    Fail($"unexpected argument '{stray}'\nusage: scskiller {usage}");
+    Fail($"unexpected argument '{stray}'\nusage: preheat {usage}");
     return 2;
 }
 
@@ -275,7 +276,7 @@ async Task<int> Status(string? query)
           cache      {(g.CacheOnDisk is { } c ? $"{Format.Bytes(c)} on disk{(Format.InUseShown(c, g.CacheInUse) ? $", {Format.Bytes(g.CacheInUse)} in use" : "")} (driver-cache files its warms or the game had open)" : "-")}{(g.WindowsCache is { } wc ? $", {Format.Bytes(wc)} in its D3DSCache folder" : "")}
           keys       {(rec.CacheKeys.Count > 0 ? string.Join(", ", rec.CacheKeys.Order()) : "-")}{(k.WarmAgs(g.Game.Id) is { } ags ? $" (compiles register its AGS app name {ags.App} as the game does: the exe name's case doesn't matter)" : AmdAppCache.IsNameHashed(rec.CacheKeys, ScsKiller.WarmExeName(g.Game, rec)) == false ? " (an app profile's key, not the exe name's hash: the name's case doesn't matter)" : "")}
           recorder   {(g.RecorderInstalled ? ScsKiller.Frames11(g.Engine, k.Vendor.Caps) ? "installed, frame times only" : "installed" : g.RecorderForeign ? ScsKiller.ForeignPlaced : "not installed")}{((!g.RecorderInstalled || g.RecorderFailure != null) && RecorderWhy(g) is { } off && off != ScsKiller.ForeignNote ? $" ({off})" : g is { RecorderInstalled: false, RecorderForeign: true, RecorderSkip: null, RecorderEffective: false } ? " (record install <game> takes it over)" : "")}{(g.RecorderRefused is { } why ? $". {(ScsKiller.NeverRecorded(g) ? ScsKiller.NothingRecordedTitle + ". " : "")}{why}" : "")}
-          recording  {(g.RecordingBytes > 0 ? $"{(g.RecordingBytes < 1 << 20 ? $"{Math.Max(1, g.RecordingBytes >> 10)} KB" : Format.Bytes(g.RecordingBytes))} (the game folder's files and SCSKiller's copy)" : "-")}{(g.RecordingBytes > 0 && (g.RecordedPipelines ?? (g.Plan is { } pl ? pl.Recorded - (pl.FromDownload ?? 0) - (pl.FromCommunity ?? 0) : null)) is { } rp ? $", {rp:N0} pipelines" : "")}, limit {ScsKiller.LimitText(k.Settings.RecordingLimitMB)} per game{(g.RecordingPaused ? $". {ScsKiller.PausedNote(k.Settings)}" : "")}
+          recording  {(g.RecordingBytes > 0 ? $"{(g.RecordingBytes < 1 << 20 ? $"{Math.Max(1, g.RecordingBytes >> 10)} KB" : Format.Bytes(g.RecordingBytes))} (the game folder's files and Preheat's copy)" : "-")}{(g.RecordingBytes > 0 && (g.RecordedPipelines ?? (g.Plan is { } pl ? pl.Recorded - (pl.FromDownload ?? 0) - (pl.FromCommunity ?? 0) : null)) is { } rp ? $", {rp:N0} pipelines" : "")}, limit {ScsKiller.LimitText(k.Settings.RecordingLimitMB)} per game{(g.RecordingPaused ? $". {ScsKiller.PausedNote(k.Settings)}" : "")}
           last play  {(g.LastSession is { } l ? $"{Hms(l.Duration)}, {l.Requests} pipelines: {l.FromGameLibrary} from the game's library, {l.CacheHits} cache hits, {l.Compiles} compiles (worst {l.WorstCompileMs:0.0} ms){(l.StartupCompiles > 0 ? $", {l.StartupCompiles} compiles while the game started or loaded" : "")}{(l.RayQueryRecompiles > 0 ? $", {l.RayQueryRecompiles} ray-traced pipelines the driver partly recompiles every launch" : "")}{(l.StateObjectsReady + l.StateObjectsCompiled + l.StateObjectsStartupCompiled > 0 ? $". Ray tracing state objects: {l.StateObjectsReady} ready, {l.StateObjectsCompiled} compiled{(l.StateObjectsStartupCompiled > 0 ? $", {l.StateObjectsStartupCompiled} compiled while the game started or loaded" : "")}" : "")}" : "-")}
           1st launch {(rec.FirstLaunch is { } fl ? $"{fl.At.LocalDateTime:yyyy-MM-dd HH:mm}, after the last compile: {fl.Hits} cache hits, {fl.Compiles} compiles ({fl.Compiled * 100:0.0}% compiled{(fl.ShaderSets is { } sets ? $", {sets}" : "")})" : "-")}
         """);
@@ -310,11 +311,12 @@ static void PrintQueueChanges(ScsKiller k)
     };
 }
 
-async Task<int> RunQueue(ScsKiller k, IReadOnlyList<GameState> targets, bool whenIdle = false)
+async Task<int> RunQueue(ScsKiller k, IReadOnlyList<GameState> targets, bool whenIdle = false, string? stopFile = null)
 {
     if (targets.Count == 0) { Console.WriteLine("nothing to compile"); return 0; }
     PrintQueueChanges(k);
     var run = new QueueRun(k);
+    bool stopAsked = false;
     void Stop()
     {
         Console.WriteLine("stopping (in-flight compiles finish so the driver writes its cache)...");
@@ -326,6 +328,11 @@ async Task<int> RunQueue(ScsKiller k, IReadOnlyList<GameState> targets, bool whe
         Stop();
     };
     if (OperatingSystem.IsLinux()) StopOnSignals(Stop);
+    // Preheat: a caller without a console (a launcher) asks for the same safe stop by creating this file
+    using var stopWatch = stopFile == null ? null : new Timer(_ =>
+    {
+        if (File.Exists(stopFile) && !Volatile.Read(ref stopAsked)) { Volatile.Write(ref stopAsked, true); Stop(); }
+    }, null, TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(500));
     if (run.Start(targets.Select(t => t.Game.Id), whenIdle) && whenIdle)
         Console.WriteLine($"waiting until the PC has been idle for {k.IdleAfter.TotalMinutes:0} min (pauses on input)");
     await k.WhenQueueIdle();
@@ -435,7 +442,7 @@ async Task<int> BeforeAfterCommand()
             Console.WriteLine($"still set aside for {game}: {folder}");
             foreach (var f in files) Console.WriteLine($"  {f}");
         }
-        Console.WriteLine("SCSKiller puts it back at its next start, once nothing uses it");
+        Console.WriteLine("Preheat puts it back at its next start, once nothing uses it");
         if (code == 0) code = 3;
     }
     await k.WhenQueueIdle();
@@ -533,7 +540,7 @@ async Task<int> CachePage()
 {
     var k = await Open();
     var inv = k.CacheInventory();
-    if (inv.Folders.Count == 0 && inv.Groups.Count == 0) Console.WriteLine("SCSKiller doesn't know where this GPU's driver keeps its cache.");
+    if (inv.Folders.Count == 0 && inv.Groups.Count == 0) Console.WriteLine("Preheat doesn't know where this GPU's driver keeps its cache.");
     foreach (var f in inv.Folders)
         Console.WriteLine($"folder: {f.Label}  {f.Path}  {Format.Bytes(f.Bytes)}{(f.Exists ? "" : "  not created yet")}{(f.Final is { } at ? $"  stored in {at}" : "")}");
     Console.WriteLine($"total: {Format.Bytes(inv.Groups.Sum(g => g.Bytes))}");
@@ -560,8 +567,8 @@ async Task<int> CachePage()
 
 async Task<int> Compile()
 {
-    if (args.Length < 2) return Fail("compile <game|--all-ready> [--threads N] [--idle | --when-idle] [--careful | --fast] [--rt-only]");
-    Only("--all-ready", "--threads", "--idle", "--when-idle", "--careful", "--fast", "--rt-only");
+    if (args.Length < 2) return Fail("compile <game|--all-ready> [--threads N] [--idle | --when-idle] [--careful | --fast] [--rt-only] [--stop-file F]");
+    Only("--all-ready", "--threads", "--idle", "--when-idle", "--careful", "--fast", "--rt-only", "--stop-file");
     int? threads = Opt("--threads") is { } t ? int.TryParse(t, out var n) && n > 0 ? n : throw new ArgumentException("--threads takes a number of threads") : null;
     using var awake = KeepAwake.Start();   // before the first await: still on the main thread
     var k = await Open(game: args[1] == "--all-ready" ? null : args[1], collection: true);
@@ -581,7 +588,7 @@ async Task<int> Compile()
         }
     if (args.Contains("--rt-only"))
         foreach (var g in targets) k.RtOnlyNext(g.Game.Id);
-    return await RunQueue(k, targets, whenIdle);
+    return await RunQueue(k, targets, whenIdle, Opt("--stop-file"));
 }
 
 async Task<int> RewarmStale(bool ifDriverChanged)
@@ -604,7 +611,7 @@ async Task<int> RewarmStale(bool ifDriverChanged)
             }
             Console.WriteLine($"{stale.Count} game(s) need a re-warm (driver {k.Vendor.Gpu.DriverVersion}):");
             foreach (var s in stale) Row(s);
-            Console.WriteLine("Run 'scskiller compile <game>' or open SCSKiller to re-warm them.");
+            Console.WriteLine("Run 'preheat compile <game>' or open Preheat to re-warm them.");
             return 0;
         // the app compiles them at once (ScsKiller.RewarmRightAway); without one, this run waits for idle
         case DriverUpdateMode.WhenIdle when k.Settings.DriverRightAway && ifDriverChanged && ScsKiller.StartDriverUpdated() is { } handedTo:
@@ -983,7 +990,7 @@ sealed class KeepAwake : IDisposable
         {
             try
             {
-                string[] inhibit = ["systemd-inhibit", "--what=idle", "--mode=block", "--who=SCSKiller", "--why=Compiling shaders", "cat"];
+                string[] inhibit = ["systemd-inhibit", "--what=idle", "--mode=block", "--who=Preheat", "--why=Compiling shaders", "cat"];
                 // own session: a Ctrl+C in the terminal reaches the CLI only, and the lock stays while it drains
                 try { awake._inhibit = Start("setsid", inhibit); }
                 catch (Exception) { awake._inhibit = Start(inhibit[0], inhibit[1..]); }

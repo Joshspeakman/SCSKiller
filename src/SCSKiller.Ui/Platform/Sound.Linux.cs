@@ -12,7 +12,7 @@ static class Sound
 
     public static void Information() => Task.Run(() =>
     {
-        if (Start("canberra-gtk-play", "--id", Name, "--description", "SCSKiller")) return;
+        if (Start("canberra-gtk-play", "--id", Name, "--description", "Preheat")) return;
         if (Find(Name, DataDirs()) is not { } file) return;
         if (!Start("pw-play", file)) Start("paplay", file);
     });

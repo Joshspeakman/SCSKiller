@@ -136,7 +136,7 @@ static class FlatpakGrant
     /// <summary>Why the override can't be made here, null when it can: SCSKiller runs as a Flatpak (no flatpak command of the
     /// host's), there's none, or the folder's path has what --filesystem or the override file reads as a separator.</summary>
     public static string? CantGrant(string folder) =>
-        LinuxStartup.InFlatpak ? "the Flatpak version of SCSKiller can't change another Flatpak's permissions"
+        LinuxStartup.InFlatpak ? "the Flatpak version of Preheat can't change another Flatpak's permissions"
         : OnPath("flatpak") == null ? "the flatpak command isn't there"
         : Path.GetFullPath(folder).IndexOfAny([':', ';', '\n', '\\']) >= 0 ? "the recorder folder's path has a ':', ';' or '\\'"
         : null;

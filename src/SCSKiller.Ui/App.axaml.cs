@@ -113,7 +113,7 @@ public partial class App : Application
     public static MainWindow Start(bool screenshots)
     {
         var fake = new FakeScsKiller();
-        var fakeDir = Path.Combine(Path.GetTempPath(), $"SCSKiller-fake-{Environment.ProcessId}");
+        var fakeDir = Path.Combine(Path.GetTempPath(), $"Preheat-fake-{Environment.ProcessId}");
         (Host.Core, Host.Design, Host.Ui, Host.Icons) = (fake, new FakeDesign(fake), new UiThread(), new Icons());
         (Host.Store, Host.Log) = (new AppStore(fakeDir), new AppLog(fakeDir));
         Host.Account = Account = screenshots ? FakeAccount.Create(fakeDir) : new Account(fakeDir);

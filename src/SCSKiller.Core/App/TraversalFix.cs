@@ -30,7 +30,7 @@ public static class TraversalFix
 
     public const string Title = "Traversal stutter fix (experimental)";
     public const string AskIntro = "I've been investigating for a while and working on a potential fix for big traversal stutters and I found a way that seems to reduce the big spikes a lot.";
-    public const string AskBody = "SCSKiller can try to reduce the stutter when a game streams in a new area. Experimental, and only in games with the recorder.";
+    public const string AskBody = "Preheat can try to reduce the stutter when a game streams in a new area. Experimental, and only in games with the recorder.";
     public const string VramLine = "Recommended for GPUs with more than 8 GB of VRAM.";
     public const string LowVramWarning = "Your GPU reports 8 GB of VRAM or less. Games may crash with the fix enabled.";
     public const string AskFooter = "Change it any time in Settings, or turn it off for one game on its page.";
@@ -48,7 +48,7 @@ public static class TraversalFix
     public static int GameIndex(GameState s) => s.TraversalOverride switch { null => 0, true => 1, false => 2 };
     public static bool? OverrideAt(int index) => index switch { 1 => true, 2 => false, _ => null };
 
-    public static string AntiCheatLine(GameState s) => $"{(ScsKiller.AntiCheatOpen(s) ? "Its anti-cheat check didn't finish" : $"This game contains {ScsKiller.AntiCheatName(s)}")}. Enabling the fix is at your own risk. SCSKiller isn't responsible for bans.";
+    public static string AntiCheatLine(GameState s) => $"{(ScsKiller.AntiCheatOpen(s) ? "Its anti-cheat check didn't finish" : $"This game contains {ScsKiller.AntiCheatName(s)}")}. Enabling the fix is at your own risk. Preheat isn't responsible for bans.";
 
     /// <summary>The game page's description: the line, the anti-cheat line, and the VRAM line unless <see cref="LowVramWarning"/> shows instead.</summary>
     public static string GameNote(GameState s, GpuInfo gpu) =>

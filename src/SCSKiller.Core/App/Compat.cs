@@ -40,8 +40,8 @@ public sealed record CompatReport(string GameId, string StoreBuildKey, CompatCho
 
     /// <summary>What the rating popup says a report sends.</summary>
     public static string WhatIsSent => OperatingSystem.IsWindows()
-        ? "Sent with the rating: your CPU model, GPU model, driver version, Windows version, and what SCSKiller compiled for this game. Nothing else."
-        : "Sent with the rating: your CPU model, GPU model, driver version, Linux kernel version, the game's Proton version, and what SCSKiller compiled for this game. Nothing else.";
+        ? "Sent with the rating: your CPU model, GPU model, driver version, Windows version, and what Preheat compiled for this game. Nothing else."
+        : "Sent with the rating: your CPU model, GPU model, driver version, Linux kernel version, the game's Proton version, and what Preheat compiled for this game. Nothing else.";
 
     /// <summary>Why the game page's Rate this compile is off for <paramref name="s"/> on the GPU vendor <paramref name="vendor"/>
     /// (<see cref="ScsKiller.PackGpu"/>; the server takes "nvidia" and "amd" only); null when it is on: a store build compiled and played at least once since, or whose
@@ -57,7 +57,7 @@ public sealed record CompatReport(string GameId, string StoreBuildKey, CompatCho
         : !(s.PlayedAt > s.WarmedAt) ? "Play the game once since it compiled to rate how it ran."
         : null;
 
-    public const string NoBuild = "SCSKiller can't tell which version of this game is installed.";
+    public const string NoBuild = "Preheat can't tell which version of this game is installed.";
 
     /// <summary>The store build key uploads use too (game id, "@", the store's build id).</summary>
     public static string BuildKey(Game g) => $"{g.Id}@{g.Version}";

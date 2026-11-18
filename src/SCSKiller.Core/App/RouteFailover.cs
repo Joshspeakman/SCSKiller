@@ -16,7 +16,7 @@ public sealed class RouteFailover : DelegatingHandler
     public static readonly RouteFailover Default = new();
 
     /// <summary>The User-Agent's product; the CLI sets SCSKiller-CLI before its first request.</summary>
-    public static string Product { get; set; } = "SCSKiller";
+    public static string Product { get; set; } = "Preheat";
 
     /// <summary>The User-Agent of every request through this handler, any host. Names the build, nothing that identifies the user or the PC.</summary>
     public static string UserAgent(string product, AppVersion v, int windowsBuild) => $"{product}/{v} ({v.Channel}; Windows {windowsBuild})";

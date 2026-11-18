@@ -200,12 +200,12 @@ public sealed class WarmJob
             if (fd == null)
             {
                 if (error != Libc.NoSuchProcess)
-                    log?.Invoke($"a compile process left running by an SCSKiller that has exited (pid {pid}) is left alone: no pidfd could be opened for it ({Marshal.GetPInvokeErrorMessage(error)})");
+                    log?.Invoke($"a compile process left running by an Preheat that has exited (pid {pid}) is left alone: no pidfd could be opened for it ({Marshal.GetPInvokeErrorMessage(error)})");
                 continue;
             }
             if (Orphan(pid) is not { } image || !signals.Signal(fd, Libc.SigKill)) continue;
             ended.Add(pid);
-            log?.Invoke($"ended {Path.GetFileName(image)} (pid {pid}), a compile process left running by an SCSKiller that has exited");
+            log?.Invoke($"ended {Path.GetFileName(image)} (pid {pid}), a compile process left running by an Preheat that has exited");
         }
         return ended;
     }

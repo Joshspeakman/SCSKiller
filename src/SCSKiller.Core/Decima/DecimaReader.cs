@@ -81,7 +81,7 @@ public sealed class DecimaReader(string? dataDir = null) : IEngineReader
         var bySize = archives.OrderBy(f => f.Length).Select(f => f.FullName).ToList();
         if (fork == HorizonZeroDawn)
         {
-            if (bySize.Count == 0) return new EngineInfo(Family, Version, fork, "D3D12", false, "an archive version SCSKiller doesn't read");
+            if (bySize.Count == 0) return new EngineInfo(Family, Version, fork, "D3D12", false, "an archive version Preheat doesn't read");
             var why = "";
             return bySize.Any(f => { using var a = DecimaArchive.Open(f, null, out why); return a != null; }) ? new EngineInfo(Family, Version, fork, "D3D12", false, null)
                 : new EngineInfo(Family, Version, fork, "D3D12", false, $"its archives don't open ({why})");

@@ -31,12 +31,12 @@ static partial class SingleInstance
         }
         catch (IOException e) when (e.HResult == 35)   // EWOULDBLOCK: another process holds it
         {
-            Console.Error.WriteLine($"SCSKiller already runs on {dir}");
+            Console.Error.WriteLine($"Preheat already runs on {dir}");
             return false;
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            Console.Error.WriteLine($"SCSKiller couldn't lock {Path.Combine(dir, FolderInstance.LockFile)}, so it leaves game folders alone: {e.Message}");
+            Console.Error.WriteLine($"Preheat couldn't lock {Path.Combine(dir, FolderInstance.LockFile)}, so it leaves game folders alone: {e.Message}");
             return true;
         }
     }
@@ -48,10 +48,10 @@ static partial class SingleInstance
             case FolderInstance.Outcome.HandedOver:
                 return true;
             case FolderInstance.Outcome.NoAnswer:
-                Console.Error.WriteLine($"SCSKiller already runs on {dir} and didn't answer");
+                Console.Error.WriteLine($"Preheat already runs on {dir} and didn't answer");
                 return true;
             case FolderInstance.Outcome.NoLock:
-                Console.Error.WriteLine($"SCSKiller couldn't lock {Path.Combine(dir, FolderInstance.LockFile)}, so it leaves game folders alone");
+                Console.Error.WriteLine($"Preheat couldn't lock {Path.Combine(dir, FolderInstance.LockFile)}, so it leaves game folders alone");
                 return false;
             default:
                 return false;

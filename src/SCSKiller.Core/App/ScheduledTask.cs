@@ -8,13 +8,13 @@ namespace SCSKiller.Core.App;
 /// <c>scskiller rewarm-stale --if-driver-changed</c> as the current user (no elevation).</summary>
 public static class ScheduledTask
 {
-    public const string Name = @"SCSKiller\RewarmStale";
+    public const string Name = @"Preheat\RewarmStale";
 
     public static string Xml(string cliExe, string user)
     {
         XNamespace ns = "http://schemas.microsoft.com/windows/2004/02/mit/task";
         var doc = new XDocument(new XDeclaration("1.0", "UTF-16", null), new XElement(ns + "Task", new XAttribute("version", "1.2"),
-            new XElement(ns + "RegistrationInfo", new XElement(ns + "Description", "SCSKiller: re-warm game shader caches after a GPU driver update")),
+            new XElement(ns + "RegistrationInfo", new XElement(ns + "Description", "Preheat: re-warm game shader caches after a GPU driver update")),
             new XElement(ns + "Triggers",
                 new XElement(ns + "LogonTrigger", new XElement(ns + "Enabled", "true"), new XElement(ns + "UserId", user), new XElement(ns + "Delay", "PT2M")),
                 new XElement(ns + "IdleTrigger", new XElement(ns + "Enabled", "true"))),
@@ -76,7 +76,7 @@ public static class ScheduledTask
     /// <summary>The published app, one folder above the CLI (dist\SCSKiller\SCSKiller.exe next to cli\). Null in dev builds.</summary>
     public static string? AppExe(string? baseDir = null)
     {
-        var app = Path.GetFullPath(Path.Combine(baseDir ?? AppContext.BaseDirectory, "..", "SCSKiller.exe"));
+        var app = Path.GetFullPath(Path.Combine(baseDir ?? AppContext.BaseDirectory, "..", "Preheat.exe"));
         return File.Exists(app) ? app : null;
     }
 }

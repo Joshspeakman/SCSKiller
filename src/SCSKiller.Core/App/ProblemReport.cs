@@ -50,7 +50,7 @@ public static class ProblemReport
         (DateTime At, IReadOnlyList<string> Lines)? warm = null)
     {
         var b = new System.Text.StringBuilder();
-        b.AppendLine($"SCSKiller {appVersion}");
+        b.AppendLine($"Preheat {appVersion}");
         b.AppendLine($"Game: {game} ({store})");
         b.AppendLine($"GPU: {gpu ?? "unknown"} ({vendor ?? "unknown vendor"}), driver {driver ?? "unknown"}");
         b.AppendLine(system);

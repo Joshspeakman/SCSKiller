@@ -50,7 +50,7 @@ public sealed class DagorReader : IEngineReader
         // the driver caches per exe name: a store that found the launcher would warm the wrong one
         var exe = GaijinSource.Exe(game.InstallDir);
         return new EngineInfo(Family, version, CbvRanges(game) ? CbvRangesFork : null, Api(game), false,
-            version != Version ? $"shader dump version {version}: SCSKiller reads version {Version}"
+            version != Version ? $"shader dump version {version}: Preheat reads version {Version}"
             : exe != null && !string.Equals(exe, Path.GetFullPath(game.ExePath), StringComparison.OrdinalIgnoreCase)
                 ? $"listed with {Path.GetFileName(game.ExePath)}, but the game runs {Path.GetRelativePath(game.InstallDir, exe)}" : null);
     }

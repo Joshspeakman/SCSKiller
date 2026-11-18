@@ -24,7 +24,7 @@ public static class CrashLog
                 var path = Path.Combine(dataDir, FileName);
                 try { if (new FileInfo(path) is { Exists: true, Length: > 1 << 20 } full) full.MoveTo(Path.Combine(dataDir, "crash.old.log"), true); }
                 catch (IOException) { }   // another process holds the old log: this entry goes on the long one
-                _lastWritten = ScsKiller.AppendLog(dataDir, FileName, $"SCSKiller {AppVersion.Current} on {(OperatingSystem.IsWindows() ? "Windows" : OperatingSystem.IsMacOS() ? "macOS" : "Linux")} {Environment.OSVersion.Version}: {e}");
+                _lastWritten = ScsKiller.AppendLog(dataDir, FileName, $"Preheat {AppVersion.Current} on {(OperatingSystem.IsWindows() ? "Windows" : OperatingSystem.IsMacOS() ? "macOS" : "Linux")} {Environment.OSVersion.Version}: {e}");
             }
             catch (Exception) { }   // a log that can't be written must not turn the crash into another one
             return _lastWritten;

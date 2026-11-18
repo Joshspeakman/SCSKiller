@@ -159,7 +159,7 @@ public sealed class Sharing
         IProgress<string>? log = null)
     {
         this.dataDir = dataDir;
-        file = new(Path.Combine(dataDir, "upload.dat"), "SCSKiller sharing registration", keyring, log);
+        file = new(Path.Combine(dataDir, "upload.dat"), "Preheat sharing registration", keyring, log);
         this.enabled = enabled;
         this.routes = routes ?? RouteFailover.Default;
         http = new HttpClient(this.routes, disposeHandler: false) { Timeout = TimeSpan.FromSeconds(60) };
@@ -775,7 +775,7 @@ public sealed class Sharing
     }
 
     const string KeyringWaits = "Sharing waits for the system keyring, which holds this PC's sharing registration and is locked or not running.";
-    const string KeyringUnreadable = "This PC's sharing registration in the system keyring can't be read. Delete \"SCSKiller sharing registration\" there to register again.";
+    const string KeyringUnreadable = "This PC's sharing registration in the system keyring can't be read. Delete \"Preheat sharing registration\" there to register again.";
 
     async Task<string?> DeviceTokenAsync(CancellationToken ct)
     {
@@ -812,7 +812,7 @@ public sealed class Sharing
         catch (Exception e)   // registered all the same: kept for this run, since registering again counts against the server's limit
         {
             held = registered;
-            Problem = $"Couldn't save this PC's sharing registration ({e.Message}). It is used until SCSKiller closes.";
+            Problem = $"Couldn't save this PC's sharing registration ({e.Message}). It is used until Preheat closes.";
         }
         return registered.Token;
     }

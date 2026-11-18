@@ -1383,7 +1383,7 @@ public static class UnrealUserCache
 /// The game writes it at its own shader step and SCSKiller leaves it alone. Names only: no file is opened.</summary>
 public static class OwnBlobStore
 {
-    public const string Note = "This game keeps its own shader cache in its folder. SCSKiller doesn't clear or change it.";
+    public const string Note = "This game keeps its own shader cache in its folder. Preheat doesn't clear or change it.";
 
     public static bool In(string installDir)
     {

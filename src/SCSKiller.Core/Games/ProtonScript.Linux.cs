@@ -290,7 +290,7 @@ sealed partial class ProtonScript
     bool Names(string name) => _text.Contains(name, StringComparison.Ordinal);
 
     string Unread(string what) =>
-        $"SCSKiller can't tell whether its Proton in {_proton} would set its prefix up again: its script computes {what} in a way SCSKiller doesn't know";
+        $"Preheat can't tell whether its Proton in {_proton} would set its prefix up again: its script computes {what} in a way Preheat doesn't know";
 
     /// <summary>Python's readline().strip() of the file; null when there is none.</summary>
     static string? FirstLine(string path) =>

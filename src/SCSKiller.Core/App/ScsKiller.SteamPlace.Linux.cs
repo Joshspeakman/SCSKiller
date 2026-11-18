@@ -438,7 +438,7 @@ public sealed partial class ScsKiller
         }
         if (OldLaunchLine(s.Game, app))
         {
-            note = "Remove SCSKiller's line from the game's Steam launch options";
+            note = "Remove Preheat's line from the game's Steam launch options";
             return;
         }
         SteamPlaceResult? last;
@@ -453,8 +453,8 @@ public sealed partial class ScsKiller
 
     const string PlacingNote = "Putting this cache in Steam's folder", SteamReadsNote = "Steam reads this cache with no launch options";
 
-    internal const string LauncherFlatpakNote = "The compile is kept, but SCSKiller can't reach the cache of a Flatpak launcher's game yet",
-        LauncherUnseenNote = "The compile is kept. Launch the game once so SCSKiller can find its cache file",
+    internal const string LauncherFlatpakNote = "The compile is kept, but Preheat can't reach the cache of a Flatpak launcher's game yet",
+        LauncherUnseenNote = "The compile is kept. Launch the game once so Preheat can find its cache file",
         LauncherNoRoomNote = "The compile is kept, but the game's driver cache has no room for it",
         LauncherCacheOffNote = "The compile is kept, but the game's driver cache is turned off",
         LauncherSeveralNote = "The compile is kept, but the game uses several driver cache files",
@@ -495,7 +495,7 @@ public sealed partial class ScsKiller
         SteamPlaceState.Placed or SteamPlaceState.UpToDate => (r.SteamOwnsOne, r.LeftBytes > 0) switch
         {
             (true, true) => $"Steam keeps its own cache file for this game, {Format.Bytes(r.LeftBytes)} of the cache doesn't fit the merged one",
-            (true, false) => "Steam keeps its own cache file for this game. SCSKiller adds to the merged one",
+            (true, false) => "Steam keeps its own cache file for this game. Preheat adds to the merged one",
             (false, true) => $"{Format.Bytes(r.LeftBytes)} of the cache doesn't fit Steam's cache files",
             _ => SteamReadsNote,
         },
@@ -735,9 +735,9 @@ public sealed partial class ScsKiller
         details.Add(off ?? $"vkd3d-proton: {(placer.Vkd3dDir is { } dir ? $"{dir}: " : "")}{r.Vkd3d ?? "nothing to place"}");
         if (r.Why != null) details.Add($"why: {r.Why}");
         var done = r.State is SteamPlaceState.Placed or SteamPlaceState.UpToDate or SteamPlaceState.Removed || remove && r.State == SteamPlaceState.Nothing;
-        var status = placer.SteamDir.Length > 0 ? NoteOf(r) ?? (r.State == SteamPlaceState.Removed ? "Taken out of Steam's folder" : remove ? "Nothing of SCSKiller's in Steam's folder" : "Nothing to put in Steam's folder")
+        var status = placer.SteamDir.Length > 0 ? NoteOf(r) ?? (r.State == SteamPlaceState.Removed ? "Taken out of Steam's folder" : remove ? "Nothing of Preheat's in Steam's folder" : "Nothing to put in Steam's folder")
             : (remove ? null : LauncherNote(s.Game.Id, Store.GameDir(s.Game.Id), Wine.WarmAppName(Path.GetFileName(s.Game.ExePath))))
-                ?? (r.State == SteamPlaceState.Removed ? "Taken out of the game's cache file" : remove ? "Nothing of SCSKiller's in the game's cache file" : "Nothing to put in the game's cache file");
+                ?? (r.State == SteamPlaceState.Removed ? "Taken out of the game's cache file" : remove ? "Nothing of Preheat's in the game's cache file" : "Nothing to put in the game's cache file");
         report = (done, status, details);
     }
 }

@@ -149,7 +149,7 @@ public sealed partial class LibraryPage : UserControl
             item.Click += async (_, _) =>
             {
                 if (!await App.ConfirmAsync("Stop looking for games here?",
-                        $"{folder}\n\nThe games SCSKiller found only in this folder leave the library. Nothing in the folder changes.", "Stop looking")) return;
+                        $"{folder}\n\nThe games Preheat found only in this folder leave the library. Nothing in the folder changes.", "Stop looking")) return;
                 if (Fmt.Added is { } added) await Task.Run(() => added.RemoveFolder(folder));
                 Vm.Rescan(force: false);
             };
@@ -240,7 +240,7 @@ public sealed partial class LibraryPage : UserControl
             return;
         }
         var listed = Host.Core.Games.Any(s => s.Game.Id == added.Game.Id);
-        var where = added.Game.Store == Store.Manual ? "you added it already" : $"SCSKiller found it in {Fmt.StoreName(added.Game)}";
+        var where = added.Game.Store == Store.Manual ? "you added it already" : $"Preheat found it in {Fmt.StoreName(added.Game)}";
         if (listed && await App.ConfirmAsync("Already in your library", $"{added.Game.Name} is in the list: {where}.", "Open", ContentDialogButton.Primary))
             App.Main.Navigate(typeof(DetailPage), added.Game.Id);
         else if (!listed) await Message("Already in your library", $"{added.Game.Name}: {where}. Refresh the library to see it.");
@@ -274,7 +274,7 @@ public sealed partial class LibraryPage : UserControl
         e.Handled = true;
         var row = RowOf(sender);
         if (!await App.ConfirmAsync($"Record {row.Name}?",
-                $"SCSKiller adds a small {Fmt.RecorderFiles(row.State)} next to the game that writes down every pipeline it creates. " +
+                $"Preheat adds a small {Fmt.RecorderFiles(row.State)} next to the game that writes down every pipeline it creates. " +
                 "Play for about 5 minutes, close the game, then add it to the compile queue. You can remove it any time from the game's page.",
                 "Add recorder", ContentDialogButton.Primary)) return;
         try { await Task.Run(() => Host.Core.InstallRecorder(row.Id)); }   // file IO and the game's re-evaluation

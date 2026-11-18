@@ -160,7 +160,7 @@
                         <TextBlock Text="{Binding LastRebuilt}" Classes="Caption" IsVisible="{Binding HasLastRebuilt}" />
                         <Rectangle Classes="Divider" />
                         <TextBlock x:Name="NewShadersHeader" Text="When games have new shaders" Classes="Section" />
-                        <TextBlock Text="A compiled game gains pipelines from its recording, the shared shader hashes or an SCSKiller update. Never while you play."
+                        <TextBlock Text="A compiled game gains pipelines from its recording, the shared shader hashes or an Preheat update. Never while you play."
                                    Classes="Secondary" TextWrapping="Wrap" />
                         <StackPanel Classes="Radios" AutomationProperties.Name="When games have new shaders">
                             <RadioButton GroupName="NewShaders" AutomationProperties.Name="Off"
@@ -234,7 +234,7 @@
                                 <c:InfoBar IsVisible="{Binding HasAutoMessage}" Message="{Binding AutoMessage}" Severity="{Binding AutoSeverity}" IsClosable="False" />
                             </StackPanel>
                             <c:InfoBar Severity="Informational" IsClosable="False" Title="We recommend enabling it"
-                                       Message="A beta feature of the NVIDIA App: after a driver update it re-compiles the games you have already played. SCSKiller adds everything else, so both together are best. The overlap costs little: shaders NVIDIA already rebuilt take about 1 ms each here." />
+                                       Message="A beta feature of the NVIDIA App: after a driver update it re-compiles the games you have already played. Preheat adds everything else, so both together are best. The overlap costs little: shaders NVIDIA already rebuilt take about 1 ms each here." />
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -247,7 +247,7 @@
                             <!-- the account's part: its DataContext is the page's AccountVm -->
                             <StackPanel x:Name="AccountPart" x:DataType="m:AccountVm" Spacing="12">
                                 <StackPanel Spacing="12" IsVisible="{Binding SignedOut}">
-                                    <TextBlock Text="Patreon supporters get the community shader hash database and beta and alpha builds. Sign in with the Patreon account you support SCSKiller with."
+                                    <TextBlock Text="Patreon supporters get the community shader hash database and beta and alpha builds. Sign in with the Patreon account you support Preheat with."
                                                Classes="Secondary" TextWrapping="Wrap" />
                                     <StackPanel Orientation="Horizontal" Spacing="12">
                                         <Button Classes="accent" Content="Sign in with Patreon" Click="OnSignIn" IsEnabled="{Binding Idle}" />
@@ -327,7 +327,7 @@
                                 <TextBlock Text="GPU to compile for" Classes="Header" />
                                 <ComboBox ItemsSource="{Binding GpuLabels, Mode=OneTime}" SelectedIndex="{Binding GpuIndex, Mode=TwoWay}"
                                           MinWidth="220" AutomationProperties.Name="GPU to compile for" />
-                                <TextBlock Text="Pick the GPU your games run on. SCSKiller switches to it after a restart."
+                                <TextBlock Text="Pick the GPU your games run on. Preheat switches to it after a restart."
                                            Classes="Caption" TextWrapping="Wrap" />
                             </StackPanel>
                             <CheckBox IsChecked="{Binding ExperimentalIntel, Mode=TwoWay}" IsVisible="{Binding HasIntelGpu, Mode=OneTime}"
@@ -382,9 +382,9 @@
                         </CheckBox>
                         <c:InfoBar IsVisible="{Binding HasStartMessage}" Message="{Binding StartMessage}" Severity="Informational" IsClosable="False" />
                         <CheckBox IsChecked="{Binding CloseQuits, Mode=TwoWay}" IsVisible="{Binding ShowsCloseQuits, Mode=OneTime}"
-                                  AutomationProperties.Name="Closing the window quits SCSKiller">
+                                  AutomationProperties.Name="Closing the window quits Preheat">
                             <StackPanel Spacing="2">
-                                <TextBlock Text="Closing the window quits SCSKiller" TextWrapping="Wrap" />
+                                <TextBlock Text="Closing the window quits Preheat" TextWrapping="Wrap" />
                                 <TextBlock Text="{Binding CloseQuitsNote}" Classes="Caption" TextWrapping="Wrap" />
                             </StackPanel>
                         </CheckBox>
@@ -395,9 +395,9 @@
                                            Classes="Caption" TextWrapping="Wrap" />
                             </StackPanel>
                         </CheckBox>
-                        <CheckBox IsChecked="{Binding ScanAtStart, Mode=TwoWay}" AutomationProperties.Name="Scan games when SCSKiller starts">
+                        <CheckBox IsChecked="{Binding ScanAtStart, Mode=TwoWay}" AutomationProperties.Name="Scan games when Preheat starts">
                             <StackPanel Spacing="2">
-                                <TextBlock Text="Scan games when SCSKiller starts" TextWrapping="Wrap" />
+                                <TextBlock Text="Scan games when Preheat starts" TextWrapping="Wrap" />
                                 <TextBlock Text="{Binding ScanAtStartNote, Mode=OneTime}" Classes="Caption" TextWrapping="Wrap" />
                             </StackPanel>
                         </CheckBox>
@@ -453,7 +453,7 @@
                             <CheckBox IsChecked="{Binding RecordAntiCheatGames, Mode=TwoWay}" AutomationProperties.Name="Allow the recorder in games with anti-cheat (at your own risk)">
                                 <StackPanel Spacing="2">
                                     <TextBlock Text="Allow the recorder in games with anti-cheat (at your own risk)" TextWrapping="Wrap" />
-                                    <TextBlock Text="Enabling the recorder in games with anti-cheat is at your own risk. SCSKiller isn't responsible for bans."
+                                    <TextBlock Text="Enabling the recorder in games with anti-cheat is at your own risk. Preheat isn't responsible for bans."
                                                Classes="Caption" TextWrapping="Wrap" />
                                 </StackPanel>
                             </CheckBox>
@@ -476,7 +476,7 @@
                             <ComboBox Grid.Column="1" ItemsSource="{x:Static m:SettingsVm.RecordingLimitLabels}" MinWidth="140"
                                       SelectedIndex="{Binding RecordingLimitIndex, Mode=TwoWay}" AutomationProperties.LabeledBy="{Binding #RecordingLimitLabel}" />
                         </Grid>
-                        <TextBlock Text="Counts the recording in the game's folder and SCSKiller's copy of it. At the limit the game plays as usual: new pipelines just aren't recorded."
+                        <TextBlock Text="Counts the recording in the game's folder and Preheat's copy of it. At the limit the game plays as usual: new pipelines just aren't recorded."
                                    Classes="Caption" TextWrapping="Wrap" />
                         <TextBlock Text="{Binding RecordingSpace}" TextWrapping="Wrap" />
                         <Expander Header="Space by game" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" IsVisible="{Binding HasRecordings}">

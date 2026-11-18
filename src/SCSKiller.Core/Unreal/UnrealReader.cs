@@ -343,7 +343,7 @@ public sealed partial class UnrealReader(string? dataDir = null) : IEngineReader
     }
 
     /// <summary>What build/cue4parse/strip.cs leaves where CUE4Parse had a game's key or decryption constant.</summary>
-    internal const string StrippedKey = "needs a key SCSKiller doesn't ship";
+    internal const string StrippedKey = "needs a key Preheat doesn't ship";
 
     static readonly ConcurrentDictionary<EGame, IAesVfsReader.CustomEncryptionDelegate?> decryptions = new();
 
@@ -820,7 +820,7 @@ public sealed partial class UnrealReader(string? dataDir = null) : IEngineReader
         int carved = 0, unparsed = 0, unreadable = 0, undecoded = 0, bad = 0;
         var budget = ByteBudget.FromFreeMemory();
         var limit = new PlanBudget(MemoryBudget ?? PlanBudget.DefaultMemory(GC.GetGCMemoryInfo().TotalAvailableMemoryBytes), TimeSpan.MaxValue)
-            { What = "the shader read", Why = "SCSKiller ran out of its read budget while reading this game's packages" };
+            { What = "the shader read", Why = "Preheat ran out of its read budget while reading this game's packages" };
         var impossible = new ConcurrentQueue<string>();
         void Impossible()
         {

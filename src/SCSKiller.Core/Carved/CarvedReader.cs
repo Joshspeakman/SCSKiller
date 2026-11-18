@@ -53,7 +53,7 @@ public sealed class CarvedReader : IEngineReader
         return api;
     }
 
-    public const string Dx9Reason = "runs on DirectX 9: compiling it waits for DirectX 9 support in SCSKiller";
+    public const string Dx9Reason = "runs on DirectX 9: compiling it waits for DirectX 9 support in Preheat";
 
     /// <summary>The status line of a DirectX 9 game (<see cref="OldApi"/>), null for any other API.</summary>
     public static string? OldDxReason(string api) => api.StartsWith("D3D9", StringComparison.Ordinal) ? Dx9Reason : null;

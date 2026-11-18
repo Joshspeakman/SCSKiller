@@ -39,7 +39,7 @@ public sealed class Source2Reader : IEngineReader
         using var pak = Open(vpk);
         var version = Programs(pak).Select(e => Version(Read(pak, e))).FirstOrDefault(v => v != null);
         return new EngineInfo(Family, version?.ToString() ?? "", null, api, false,
-            version is >= MinVersion and <= MaxVersion ? null : $"shader files {(version == null ? "of an older layout" : $"version {version}")}: SCSKiller reads versions {MinVersion} to {MaxVersion}",
+            version is >= MinVersion and <= MaxVersion ? null : $"shader files {(version == null ? "of an older layout" : $"version {version}")}: Preheat reads versions {MinVersion} to {MaxVersion}",
             OffersVulkan: true);
     }
 

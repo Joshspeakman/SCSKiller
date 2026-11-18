@@ -71,13 +71,13 @@ public static partial class Elevated
     public static string? CliExe(string? baseDir = null)
     {
         baseDir ??= AppContext.BaseDirectory;
-        var published = Path.Combine(baseDir, "cli", "scskiller.exe");
+        var published = Path.Combine(baseDir, "cli", "preheat.exe");
         if (File.Exists(published)) return published;
         for (var d = new DirectoryInfo(baseDir); d != null; d = d.Parent)
         {
             var bin = Path.Combine(d.FullName, "src", "SCSKiller.Cli", "bin");
             if (Directory.Exists(bin))
-                return new DirectoryInfo(bin).EnumerateFiles("scskiller.exe", SearchOption.AllDirectories)
+                return new DirectoryInfo(bin).EnumerateFiles("preheat.exe", SearchOption.AllDirectories)
                     .OrderByDescending(f => f.LastWriteTimeUtc).FirstOrDefault()?.FullName;
         }
         return null;

@@ -108,9 +108,9 @@ public sealed partial class SettingsPage : UserControl
     public static ContentDialog AntiCheatDetailsDialog() => new()
     {
         Title = "Recording in games with anti-cheat", CloseButtonText = "Close",
-        Content = "For one session, SCSKiller puts its recorder (a d3d12.dll) next to the game's exe.\n\n"
-            + "SCSKiller removes every file it places when the game exits, or after a crash at your next logon.\n\n"
-            + "Enabling the recorder in games with anti-cheat is at your own risk. SCSKiller isn't responsible for bans.",
+        Content = "For one session, Preheat puts its recorder (a d3d12.dll) next to the game's exe.\n\n"
+            + "Preheat removes every file it places when the game exits, or after a crash at your next logon.\n\n"
+            + "Enabling the recorder in games with anti-cheat is at your own risk. Preheat isn't responsible for bans.",
     };
 
     async void OnAntiCheatDetails(object? _, RoutedEventArgs __) => await App.ShowAsync(AntiCheatDetailsDialog());
@@ -118,7 +118,7 @@ public sealed partial class SettingsPage : UserControl
     async void OnRemoveRecorders(object? _, RoutedEventArgs __)
     {
         if (Host.Core is not ScsKiller real || !await App.ConfirmAsync("Remove recorders?",
-                "SCSKiller removes its recorder from every game, then quits. Close your games first: a game that's running keeps its recorder. Recording resumes when SCSKiller starts again.", "Remove and quit")) return;
+                "Preheat removes its recorder from every game, then quits. Close your games first: a game that's running keeps its recorder. Recording resumes when Preheat starts again.", "Remove and quit")) return;
         var removed = await Task.Run(real.RemoveRecorders);
         string[] left = [.. removed.Games.Where(r => r.Left != null).Select(r => $"{real.Games.FirstOrDefault(s => s.Game.Id == r.GameId)?.Game.Name ?? r.Folder}: {r.Left}"),
             .. removed.VulkanLeft is { } vulkan ? [$"Vulkan recorders' registrations: {vulkan}"] : Array.Empty<string>()];
